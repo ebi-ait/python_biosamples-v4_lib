@@ -1,6 +1,6 @@
 from json import JSONEncoder
 from datetime import datetime
-from biosamples_lib.Models import Sample, Attribute, Relationship
+from biosamples_lib.Models import Sample, Attribute, Relationship, Curation
 
 
 class ISODateTimeEncoder(JSONEncoder):
@@ -78,4 +78,21 @@ class AttributeListEncoder(JSONEncoder):
 class ExternalReferenceEncoder(JSONEncoder):
     def default(self, o):
         _dict = {"url": o["url"]}
+        return _dict
+
+
+class CurationObjectEncoder(JSONEncoder):
+    def default(self, o):
+        if not isinstance(o, Curation):
+            return JSONEncoder.default(self, o)
+
+        _dict = dict()
+        _dict["sample"] = o.accession
+        _dict["curation"] = dict()
+
+        _dict["curation"]["attributesPre"] = o.attr_pre
+        _dict["curation"]["attributesPost"] = o.attr_post
+        _dict["curation"]["externalReferencesPre"] = o.rel_pre
+        _dict["curation"]["externalReferencesPost"] = o.rel_post
+        _dict["domain"] = o.domain
         return _dict

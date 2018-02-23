@@ -1,93 +1,21 @@
-import json
 from datetime import datetime
 
 
 class Sample:
     def __init__(self, accession=None, name=None, release=datetime.utcnow(), update=datetime.utcnow(),
                  attributes=None, relationships=None, external_references=None, organizations=None, contacts=None,
-                 publications=None, domain=None, **kwargs):
+                 publications=None, domain=None):
         self.accession = accession
         self.name = name
         self.release = release
         self.update = update
         self.domain = domain
-        if attributes is None:
-            attributes = []
-        self.attributes = []
-
-        for crt_name in attributes:
-            if isinstance(crt_name, Attribute):
-                self.attributes.append(crt_name)
-            else:
-                crt_values = attributes[crt_name]
-                for crt in crt_values:
-                    self.attributes.append(
-                        Attribute(name=crt_name, **crt))
-
-        if relationships is None:
-            relationships = []
-        self.relations = relationships
-
-        if external_references is None:
-            external_references = []
-        self.external_references = external_references
-
-        if organizations is None:
-            organizations = []
-        self.organizations = organizations
-
-        if contacts is None:
-            contacts = []
-        self.contacts = contacts
-
-        if publications is None:
-            publications = []
-        self.publications = publications
-
-
-    # @property
-    # def accession(self):
-    #     return self._accession
-    #
-    # @property
-    # def name(self):
-    #     return self._name
-    #
-    # @property
-    # def release(self):
-    #     return self._release
-    #
-    # @property
-    # def update(self):
-    #     return self._update
-    #
-    # @property
-    # def characteristics(self):
-    #     return self._characteristics
-    #
-    # @property
-    # def relations(self):
-    #     return self._relations
-    #
-    # @property
-    # def external_references(self):
-    #     return self._external_references
-    #
-    # @property
-    # def organizations(self):
-    #     return self._organizations
-    #
-    # @property
-    # def contacts(self):
-    #     return self._contacts
-    #
-    # @property
-    # def publications(self):
-    #     return self._publications
-    #
-    # @property
-    # def domain(self):
-    #     return self._domain
+        self.attributes = [] if attributes is None else attributes
+        self.relations = [] if relationships is None else relationships
+        self.external_references = [] if external_references is None else external_references
+        self.organizations = [] if organizations is None else organizations
+        self.contacts = [] if contacts is None else contacts
+        self.publications = [] if publications is None else publications
 
     def __str__(self):
         return "Sample {}".format(self.accession)
@@ -99,45 +27,32 @@ class Attribute:
             raise Exception("Attribute need at least a type and a value")
         self.name = name
         self.value = value
-        if iris is None:
-            iris = []
-        self.iris = iris
+        self.iris = [] if iris is None else iris
         self.unit = unit
-
-    # @property
-    # def name(self):
-    #     return self._name
-    #
-    # @property
-    # def value(self):
-    #     return self._value
-    #
-    # @property
-    # def iris(self):
-    #     return self._iris
-    #
-    # @property
-    # def unit(self):
-    #     return self._unit
 
 
 class Relationship:
-    def __init__(self, source=None, type=None, target=None):
-        if source is None or type is None or target is None:
+    def __init__(self, source=None, rel_type=None, target=None):
+        if source is None or rel_type is None or target is None:
             raise Exception("You need to provide a source, "
-                            "a target and the type of relation to make it valid")
-        self._source = source
-        self._type = type
-        self._target = target
+                            "a target and the rel_type of relation to make it valid")
+        self.source = source
+        self.rel_type = type
+        self.target = target
 
-    @property
-    def source(self):
-        return self._source
 
-    @property
-    def type(self):
-        return self._type
+class Curation:
+    def __init__(self, accession=None, attributes_pre=None, attributes_post=None,
+                 external_references_pre=None, external_references_post=None, domain=None):
+        if accession is None:
+            raise Exception("An accession is needed to create a curation object")
 
-    @property
-    def target(self):
-        return self._target
+        if domain is None:
+            raise Exception("A domain is needed to create a curation object")
+
+        self.accession = accession
+        self.attr_pre = [] if attributes_pre is None else attributes_pre
+        self.attr_post = [] if attributes_post is None else attributes_post
+        self.rel_pre = [] if external_references_pre is None else external_references_pre
+        self.rel_post = [] if external_references_post is None else external_references_post
+        self.domain = domain
