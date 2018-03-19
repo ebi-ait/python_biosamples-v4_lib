@@ -1,12 +1,13 @@
 import requests
 import re
 
+
 class Traverson:
     def __init__(self, base_url):
         session = requests.Session()
         session.headers.update({
             "Accept": "application/hal+json",
-            # "Content-Type": "application/hal+json"
+            "Content-Type": "application/hal+json"
         })
         self.__param_regex = "{\?([A-Za-z0-9,]+)}"
         self.__session = session
@@ -51,9 +52,9 @@ class Traverson:
                 response = self.__session.get(url=curr_url)
                 if response.status_code != requests.codes.ok:
                     raise Exception("An error occurred while retrieving {} - HTTP({})".format(curr_url,
-                                                    response.status_code))
+                                                                                              response.status_code),
+                                    response)
                 content = response.json()
             else:
                 raise Exception("Couldn't find link {} on resource at {}".format(link, curr_url))
         return response
-

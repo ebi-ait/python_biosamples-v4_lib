@@ -1,9 +1,9 @@
 import requests
 
-from biosamples_lib.utilities import is_ok
-from biosamples_lib.traverson import Traverson
-from biosamples_lib import aap_client
-from biosamples_lib.Encoders import CurationObjectEncoder
+from biosamples.utilities import is_ok
+from biosamples.traverson import Traverson
+import biosamples.aap_client as aap_client
+from biosamples.Encoders import CurationObjectEncoder
 
 
 class Client:
@@ -20,9 +20,10 @@ class Client:
             .get()
         return response
 
-    def persist_sample(self, sample):
+    def persist_sample(self, sample, jwt=None):
         print("Submitting sample with accession {}".format(sample["accession"]))
-        jwt = aap_client.get_token()
+        if jwt is None:
+            jwt = aap_client.get_token()
         traverson = Traverson(self._baseurl)
         response = traverson \
             .follow("samples") \
@@ -73,3 +74,4 @@ class Client:
             json_body = CurationObjectEncoder().default(curation_object)
             response = requests.post(response.url, json=json_body, headers=headers)
         return response
+

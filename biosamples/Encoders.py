@@ -1,6 +1,6 @@
 from json import JSONEncoder
 from datetime import datetime
-from biosamples_lib.Models import Sample, Attribute, Relationship, Curation
+from biosamples.Models import Sample, Attribute, Relationship, Curation
 
 
 class ISODateTimeEncoder(JSONEncoder):
@@ -89,7 +89,6 @@ class CurationObjectEncoder(JSONEncoder):
         _dict = dict()
         _dict["sample"] = o.accession
         _dict["curation"] = dict()
-
         _dict["curation"]["attributesPre"] = o.attr_pre
         _dict["curation"]["attributesPost"] = o.attr_post
         _dict["curation"]["externalReferencesPre"] = o.rel_pre

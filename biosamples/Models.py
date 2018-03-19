@@ -2,10 +2,10 @@ from datetime import datetime
 
 
 class Sample:
-    def __init__(self, accession=None, name=None, release=datetime.utcnow(), update=datetime.utcnow(),
+    def __init__(self, sample=None, name=None, release=datetime.utcnow(), update=datetime.utcnow(),
                  attributes=None, relationships=None, external_references=None, organizations=None, contacts=None,
                  publications=None, domain=None):
-        self.accession = accession
+        self.sample = sample
         self.name = name
         self.release = release
         self.update = update
