@@ -12,10 +12,10 @@ def clean_json(json):
     return new_json
 
 
-def merge_samples(sampleA, sampleB):
-    if sampleA["accession"] != sampleB["accession"]:
+def merge_samples(sample_a, sample_b):
+    if sample_a["accession"] != sample_b["accession"]:
         raise Exception("Impossible to merge samples with different accessions")
-    return {**clean_json(sampleA), **clean_json(sampleB)}
+    return {**clean_json(sample_a), **clean_json(sample_b)}
 
 
 def is_ok(response):
