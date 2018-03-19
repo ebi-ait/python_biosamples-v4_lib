@@ -4,6 +4,7 @@ from biosamples.utilities import is_ok
 from biosamples.traverson import Traverson
 import biosamples.aap_client as aap_client
 from biosamples.Encoders import CurationObjectEncoder
+from biosamples.Models import CurationLink
 
 
 class Client:
@@ -58,6 +59,7 @@ class Client:
 
     def curate_sample(self, sample, curation_object, jwt=None):
         accession = sample["accession"]
+        curation_link = CurationLink(accession=accession, curation=curation_object)
         if jwt is None:
             jwt = aap_client.get_token()
         traverson = Traverson(self._baseurl)
@@ -71,7 +73,7 @@ class Client:
                 "Authorization": "Bearer {}".format(jwt),
                 "Content-type": "application/json"
             }
-            json_body = CurationObjectEncoder().default(curation_object)
+            json_body = CurationObjectEncoder().default(curation_link)
             response = requests.post(response.url, json=json_body, headers=headers)
         return response
 

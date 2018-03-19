@@ -42,17 +42,26 @@ class Relationship:
 
 
 class Curation:
-    def __init__(self, accession=None, attributes_pre=None, attributes_post=None,
+    def __init__(self, attributes_pre=None, attributes_post=None,
                  external_references_pre=None, external_references_post=None, domain=None):
-        if accession is None:
-            raise Exception("An accession is needed to create a curation object")
-
         if domain is None:
             raise Exception("A domain is needed to create a curation object")
 
-        self.accession = accession
         self.attr_pre = [] if attributes_pre is None else attributes_pre
         self.attr_post = [] if attributes_post is None else attributes_post
         self.rel_pre = [] if external_references_pre is None else external_references_pre
         self.rel_post = [] if external_references_post is None else external_references_post
         self.domain = domain
+
+
+class CurationLink:
+    def __init__(self, accession=None, curation=None):
+
+        if accession is None:
+            raise Exception("An accession is needed to create a curation link")
+
+        if curation is None or type(curation) is not Curation:
+            raise Exception("You need to provide a curation object as part of a curation link")
+
+        self.accession = accession
+        self.curation = curation
