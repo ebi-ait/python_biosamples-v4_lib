@@ -3,7 +3,7 @@ import requests
 from biosamples.utilities import is_ok
 from biosamples.traverson import Traverson
 import biosamples.aap_client as aap_client
-from biosamples.Encoders import CurationObjectEncoder
+from biosamples.Encoders import CurationEncoder
 from biosamples.Models import CurationLink
 
 
@@ -73,7 +73,7 @@ class Client:
                 "Authorization": "Bearer {}".format(jwt),
                 "Content-type": "application/json"
             }
-            json_body = CurationObjectEncoder().default(curation_link)
+            json_body = CurationEncoder().default(curation_link)
             response = requests.post(response.url, json=json_body, headers=headers)
         return response
 

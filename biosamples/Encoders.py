@@ -1,6 +1,6 @@
 from json import JSONEncoder
 from datetime import datetime
-from biosamples.Models import Sample, Attribute, Relationship, CurationLink
+from biosamples.Models import Sample, Attribute, Relationship, CurationLink, Curation
 
 
 class ISODateTimeEncoder(JSONEncoder):
@@ -81,19 +81,27 @@ class ExternalReferenceEncoder(JSONEncoder):
         return _dict
 
 
-class CurationObjectEncoder(JSONEncoder):
+class CurationEncoder(JSONEncoder):
+    def default(self, o):
+        if not isinstance(o, Curation):
+            return JSONEncoder.default(self, o)
+
+        _dict = dict()
+        _dict["attributesPre"] = o.attr_pre
+        _dict["attributesPost"] = o.attr_post
+        _dict["externalReferencesPre"] = o.rel_pre
+        _dict["externalReferencesPost"] = o.rel_post
+        return _dict
+
+
+class CurationLinkEncoder(JSONEncoder):
     def default(self, o):
         if not isinstance(o, CurationLink):
             return JSONEncoder.default(self, o)
 
-        cur_obj = o.curation
-
+        _cur_encoder = CurationEncoder()
         _dict = dict()
         _dict["sample"] = o.accession
-        _dict["curation"] = dict()
-        _dict["curation"]["attributesPre"] = cur_obj.attr_pre
-        _dict["curation"]["attributesPost"] = cur_obj.attr_post
-        _dict["curation"]["externalReferencesPre"] = cur_obj.rel_pre
-        _dict["curation"]["externalReferencesPost"] = cur_obj.rel_post
-        _dict["domain"] = cur_obj.domain
+        _dict["curation"] = _cur_encoder.default(o.curation)
+        _dict["domain"] = o.domain
         return _dict
