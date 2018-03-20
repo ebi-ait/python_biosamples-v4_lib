@@ -1,0 +1,4 @@
+
+class JWTMissingException(Exception):
+    pass
+
