@@ -1,6 +1,6 @@
 from json import JSONEncoder
 from datetime import datetime
-from biosamples_lib.Models import Sample, Attribute, Relationship, CurationLink, Curation
+from biosamples_lib.models import Sample, Attribute, Relationship, CurationLink, Curation
 
 
 class ISODateTimeEncoder(JSONEncoder):

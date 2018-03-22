@@ -7,6 +7,7 @@ from .exceptions import JWTMissingException
 from .traverson import Traverson
 from .encoders import CurationEncoder
 from .models import CurationLink
+from .convert_functions import dict_to_sample
 
 
 class Client:
@@ -23,6 +24,7 @@ class Client:
             .follow("sample", params={"accession": accession}) \
             .get()
         if is_ok(response):
+            # return dict_to_sample(response.json())
             return response.json()
 
         raise RequestException(response=response, message="An error occurred while fetching sample {}".format(accession))
@@ -70,7 +72,7 @@ class Client:
             if is_successful(response):
                 return response.json()
 
-        raise RequestException(response=response, message="An error occurred while updating sample in BioSamples")
+        response.raise_for_status()
 
     def curate_sample(self, sample, curation_object, domain, jwt=None):
         logging.info("Curate sample {}")
@@ -97,5 +99,5 @@ class Client:
             if is_successful(response):
                 return response.json()
 
-        raise RequestException(response=response, message="An error occurred while posting curation link to BioSamples")
+        response.raise_for_status()
 
