@@ -1,6 +1,8 @@
+from urllib import parse as urlencoder
 from json import JSONEncoder
 from datetime import datetime
-from biosamples_lib.models import Sample, Attribute, Relationship, CurationLink, Curation
+from biosamples_lib.models import Sample, Attribute, Relationship, CurationLink, Curation, SearchQuery
+from biosamples_lib.filters import _BioSamplesFilter
 
 
 class ISODateTimeEncoder(JSONEncoder):
@@ -104,4 +106,33 @@ class CurationLinkEncoder(JSONEncoder):
         _dict["sample"] = o.accession
         _dict["curation"] = _cur_encoder.default(o.curation)
         _dict["domain"] = o.domain
+        return _dict
+
+
+class BiosamplesFilterEncoder(JSONEncoder):
+    def default(self, o):
+        if not isinstance(o, _BioSamplesFilter):
+            return JSONEncoder.default(self, o)
+
+        encoded_value = o.get_value()
+        if o.get_target_field() is not None:
+            encoded_field = o.get_target_field()
+            return "{}:{}:{}".format(o.get_type(), encoded_field, encoded_value)
+        else:
+            return "{}:{}".format(o.get_type(), encoded_value)
+
+
+class SearchQueryEncoder(JSONEncoder):
+    def default(self, o):
+        if not isinstance(o, SearchQuery):
+            return JSONEncoder.default(o)
+
+        _biosamples_filter_encoder = BiosamplesFilterEncoder()
+        _dict = dict()
+        if o.text is not None:
+            _dict['text'] = o.text
+        if o.filters is not None and len(o.filters) > 0:
+            _dict['filter'] = [_biosamples_filter_encoder.default(f) for f in o.filters]
+        _dict['page'] = o.page
+        _dict['size'] = o.size
         return _dict

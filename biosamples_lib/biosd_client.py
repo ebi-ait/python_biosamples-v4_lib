@@ -5,9 +5,8 @@ import logging
 from .utilities import is_ok, is_successful
 from .exceptions import JWTMissingException
 from .traverson import Traverson
-from .encoders import CurationEncoder
-from .models import CurationLink
-from .convert_functions import dict_to_sample
+from .encoders import CurationEncoder, SearchQueryEncoder
+from .models import CurationLink, SearchQuery
 
 
 class Client:
@@ -100,4 +99,15 @@ class Client:
                 return response.json()
 
         response.raise_for_status()
+
+    def search(self, text=None, filters=None, page=0, size=50):
+        query_object = SearchQuery(text=text, filters=filters, page=page, size=size)
+        traverson = Traverson(self._url)
+        response = traverson.follow("samples").get()
+        if is_ok(response):
+            response = requests.get(response.url, params=SearchQueryEncoder().default(query_object))
+            if is_ok(response):
+                return response.json()
+        response.raise_for_status()
+
 

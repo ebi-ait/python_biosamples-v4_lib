@@ -1,4 +1,6 @@
+import logging
 from datetime import datetime
+from .filters import _BioSamplesFilter
 
 
 class Sample:
@@ -66,3 +68,18 @@ class CurationLink:
         self.accession = accession
         self.curation = curation
         self.domain = domain
+
+
+class SearchQuery:
+    def __init__(self, text=None, filters=None, page=0, size=20):
+        self.text = text
+        self.filters = list()
+        if filters is not None:
+            if not isinstance(filters, list):
+                raise Exception("Filters should be a list of BioSamplesFilter objects")
+            for f in filters:
+                if not isinstance(f, _BioSamplesFilter):
+                    raise Exception("Provided object {} is not a BioSamplesFilter".format(f))
+                self.filters.append(f)
+        self.page = page
+        self.size = size
