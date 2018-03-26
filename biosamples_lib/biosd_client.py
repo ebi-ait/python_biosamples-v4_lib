@@ -18,6 +18,7 @@ class Client:
         self._url = url
 
     def fetch_sample(self, accession):
+        logging.debug("Getting sample with accession {} from {}".format(accession, self._url))
         traverson = Traverson(self._url)
         response = traverson \
             .follow("samples") \
@@ -30,11 +31,9 @@ class Client:
         raise RequestException(response=response, message="An error occurred while fetching sample {}".format(accession))
 
     def persist_sample(self, sample, jwt=None):
-        logging.info("Submitting sample with accession {}".format(sample["accession"]))
-
+        logging.debug("Submitting sample with accession {} to {}".format(sample["accession"], self._url))
         if jwt is None:
             raise JWTMissingException
-
         traverson = Traverson(self._url)
         response = traverson \
             .follow("samples") \
@@ -53,6 +52,7 @@ class Client:
 
     def update_sample(self, sample, jwt=None):
         # TODO: update the real samples
+        logging.debug("Updating sample with accession {} on {}".format(sample["accession"], self._url))
         accession = sample["accession"]
         if jwt is None:
             raise JWTMissingException
@@ -75,7 +75,7 @@ class Client:
         response.raise_for_status()
 
     def curate_sample(self, sample, curation_object, domain, jwt=None):
-        logging.info("Curate sample {}")
+        logging.debug("Curating sample {} on {}".format(sample['accession'], self._url))
         if jwt is None:
             raise JWTMissingException
 

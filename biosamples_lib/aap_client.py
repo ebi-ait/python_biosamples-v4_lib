@@ -1,4 +1,6 @@
 import requests
+import logging
+from .utilities import is_ok
 
 
 class AapClient:
@@ -14,7 +16,9 @@ class AapClient:
         self.url = url
 
     def get_token(self):
+        logging.debug("Username {} getting token from {}".format(self.username, self.url))
         response = requests.get(self.url, auth=(self.username, self.password))
-        if response.status_code == requests.codes.ok:
+        if is_ok(response):
+            logging.debug("Got token correctly")
             return response.text
-        return response
+        return response.raise_for_status()

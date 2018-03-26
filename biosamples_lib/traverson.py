@@ -1,6 +1,7 @@
 import requests
 import re
-
+import logging
+from .utilities import is_ok
 
 class Traverson:
     def __init__(self, base_url):
@@ -37,8 +38,9 @@ class Traverson:
 
     def get(self):
         curr_url = self.__base_url
+        logging.debug("Getting url {}".format(curr_url))
         response = self.__session.get(url=curr_url)
-        if response.status_code != requests.codes.ok:
+        if not is_ok(response):
             raise Exception("An error occurred while retrieving {} - HTTP({})".format(curr_url,
                                                                                       response.status_code))
         content = response.json()
@@ -49,8 +51,9 @@ class Traverson:
                 # if hop["params"] is not None:
                 if "templated" in content["_links"][link]:
                     curr_url = self.populate_url(curr_url, hop["params"])
+                logging.debug("Getting url {}".format(curr_url))
                 response = self.__session.get(url=curr_url)
-                if response.status_code != requests.codes.ok:
+                if not is_ok(response):
                     raise Exception("An error occurred while retrieving {} - HTTP({})".format(curr_url,
                                                                                               response.status_code),
                                     response)
