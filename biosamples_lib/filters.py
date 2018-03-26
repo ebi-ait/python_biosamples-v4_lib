@@ -67,6 +67,6 @@ class RelationFilter(_NotPredefinedFieldBioSamplesFilter):
         super().__init__("rel")
 
 
-class ReverRelationFilter(_NotPredefinedFieldBioSamplesFilter):
+class ReverseRelationFilter(_NotPredefinedFieldBioSamplesFilter):
     def __init__(self):
         super().__init__("rrel")
