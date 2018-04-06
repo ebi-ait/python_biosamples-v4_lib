@@ -1,8 +1,8 @@
 from urllib import parse as urlencoder
 from json import JSONEncoder
 from datetime import datetime
-from biosamples_lib.models import Sample, Attribute, Relationship, CurationLink, Curation, SearchQuery
-from biosamples_lib.filters import _BioSamplesFilter
+from .models import Sample, Attribute, Relationship, CurationLink, Curation, SearchQuery
+from .filters import _BioSamplesFilter
 
 
 class ISODateTimeEncoder(JSONEncoder):

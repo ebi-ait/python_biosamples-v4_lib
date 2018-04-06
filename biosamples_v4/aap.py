@@ -5,7 +5,7 @@ from datetime import datetime
 from .utilities import is_ok
 
 
-class AapClient:
+class Client:
     def __init__(self, username=None, password=None, url=None):
         if username is None:
             raise Exception("An AAP username has not been provided")
@@ -19,7 +19,7 @@ class AapClient:
         self.token = None
 
     def get_token(self):
-        if self.token is None or AapClient.is_token_expired(self.token):
+        if self.token is None or Client.is_token_expired(self.token):
             logging.debug("Username {} getting token from {}".format(self.username, self.url))
             response = requests.get(self.url, auth=(self.username, self.password))
             if is_ok(response):
@@ -33,7 +33,7 @@ class AapClient:
 
     @staticmethod
     def is_token_expired(token):
-        decoded_token = AapClient.decode_token(token)
+        decoded_token = Client.decode_token(token)
         return decoded_token['exp'] < datetime.utcnow()
 
     @staticmethod

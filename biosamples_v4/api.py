@@ -9,7 +9,7 @@ from .encoders import CurationEncoder, SearchQueryEncoder
 from .models import CurationLink, SearchQuery
 
 
-class BioSamplesClient:
+class Client:
 
     def __init__(self, url=None):
         if url is None:

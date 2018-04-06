@@ -8,7 +8,7 @@ name = "pypi"
 [packages]
 
 requests = "*"
-pyjwt = "*"
+PyJWT = "*"
 
 
 [dev-packages]
