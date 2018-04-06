@@ -9,7 +9,7 @@ from .encoders import CurationEncoder, SearchQueryEncoder
 from .models import CurationLink, SearchQuery
 
 
-class Client:
+class BioSamplesClient:
 
     def __init__(self, url=None):
         if url is None:
@@ -30,7 +30,7 @@ class Client:
         raise RequestException(response=response, message="An error occurred while fetching sample {}".format(accession))
 
     def persist_sample(self, sample, jwt=None):
-        logging.debug("Submitting sample with accession {} to {}".format(sample["accession"], self._url))
+        logging.debug("Submitting new sample to {}".format(self._url))
         if jwt is None:
             raise JWTMissingException
         traverson = Traverson(self._url)
@@ -47,7 +47,7 @@ class Client:
             if is_successful(response):
                 return response.json()
 
-        raise RequestException(response=response, message="An error occurred while posting sample to BioSamples")
+        raise response.raise_for_status()
 
     def update_sample(self, sample, jwt=None):
         # TODO: update the real samples
