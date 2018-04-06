@@ -1,12 +1,12 @@
-# BioSamples v4 API Python Client
+# BioSamples v4 Python Library
 
-This is a small project which aims to provide a Python client
+This is a small library which aims to provide a Python client
 to access BioSamples v4 new API.
 
-The client is still under development, so any contribution is very
+The client is still under heavy development, so any contribution is very
 well welcomed.
 
-## Install all the dependecies and setup the virtual environment
+## Local Development
 This project uses [pipenv](https://pypi.python.org/pypi/pipenv) to handle
 both the virtual environment and the dependencies.
 Follow the instructions available on pipenv site to see how to install it.

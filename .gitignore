@@ -1,2 +1,6 @@
 **/*.pyc
 personal_tests/*
+MANIFEST
+build/
+dist/
+*.egg-info/
