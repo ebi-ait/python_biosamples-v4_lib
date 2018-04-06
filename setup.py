@@ -32,7 +32,7 @@ setup(
         'Programming Language :: Python :: 3.6',
     ],
     packages=find_packages(exclude=['contrib', 'docs', 'tests']),
-    install_requires=['requests', 'pywjt'],
+    install_requires=['requests', 'pyjwt'],
     project_urls={
         'Bug Reports': 'https://github.com/Kerruba/python_biosamples-v4_lib/issues',
         # 'Say Thanks!': 'http://saythanks.io/to/example',
