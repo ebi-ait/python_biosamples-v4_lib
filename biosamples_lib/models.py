@@ -75,11 +75,14 @@ class SearchQuery:
         self.text = text
         self.filters = list()
         if filters is not None:
-            if not isinstance(filters, list):
-                raise Exception("Filters should be a list of BioSamplesFilter objects")
-            for f in filters:
-                if not isinstance(f, _BioSamplesFilter):
-                    raise Exception("Provided object {} is not a BioSamplesFilter".format(f))
-                self.filters.append(f)
+            if isinstance(filters, _BioSamplesFilter):
+                self.filters.append(filters)
+            else:
+                if not hasattr(filters, '__iter__'):
+                        raise Exception("Provided object is not iterable")
+                for f in filters:
+                    if not isinstance(f, _BioSamplesFilter):
+                        raise Exception("Provided object {} is not a BioSamplesFilter".format(f))
+                    self.filters.append(f)
         self.page = page
         self.size = size
