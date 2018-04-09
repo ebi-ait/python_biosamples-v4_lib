@@ -34,7 +34,8 @@ class Client:
     @staticmethod
     def is_token_expired(token):
         decoded_token = Client.decode_token(token)
-        return decoded_token['exp'] < datetime.utcnow()
+        expiration_time = datetime.fromtimestamp(decoded_token['exp'])
+        return expiration_time < datetime.utcnow()
 
     @staticmethod
     def decode_token(token):
