@@ -3,13 +3,20 @@ import re
 import logging
 from .utilities import is_ok
 
+
 class Traverson:
-    def __init__(self, base_url):
+    def __init__(self, base_url, jwt=None):
         session = requests.Session()
         session.headers.update({
             "Accept": "application/hal+json",
             "Content-Type": "application/hal+json"
         })
+
+        if jwt is not None:
+            session.headers.update({
+                "Authorization": "Bearer {}".format(jwt)
+            })
+
         self.__param_regex = "{\?([A-Za-z0-9,]+)}"
         self.__session = session
         self.__base_url = base_url

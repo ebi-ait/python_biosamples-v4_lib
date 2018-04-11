@@ -16,9 +16,9 @@ class Client:
             raise Exception("You must provide the base url for the client to work")
         self._url = url
 
-    def fetch_sample(self, accession):
+    def fetch_sample(self, accession, jwt=None):
         logging.debug("Getting sample with accession {} from {}".format(accession, self._url))
-        traverson = Traverson(self._url)
+        traverson = Traverson(self._url, jwt=jwt)
         response = traverson \
             .follow("samples") \
             .follow("sample", params={"accession": accession}) \
@@ -27,13 +27,13 @@ class Client:
             # return dict_to_sample(response.json())
             return response.json()
 
-        raise RequestException(response=response, message="An error occurred while fetching sample {}".format(accession))
+        raise response.raise_for_status()
 
     def persist_sample(self, sample, jwt=None):
         logging.debug("Submitting new sample to {}".format(self._url))
         if jwt is None:
             raise JWTMissingException
-        traverson = Traverson(self._url)
+        traverson = Traverson(self._url, jwt=jwt)
         response = traverson \
             .follow("samples") \
             .get()
@@ -56,7 +56,7 @@ class Client:
         if jwt is None:
             raise JWTMissingException
 
-        traverson = Traverson(self._url)
+        traverson = Traverson(self._url, jwt=jwt)
         response = traverson \
             .follow("samples") \
             .follow("sample", params={"accession": accession}) \
@@ -81,7 +81,7 @@ class Client:
         accession = sample["accession"]
         curation_link = CurationLink(accession=accession, curation=curation_object, domain=domain)
 
-        traverson = Traverson(self._url)
+        traverson = Traverson(self._url, jwt=jwt)
         response = traverson \
             .follow("samples") \
             .follow("sample", params={"accession": accession}) \
@@ -100,9 +100,9 @@ class Client:
 
         response.raise_for_status()
 
-    def search(self, text=None, filters=None, page=0, size=50):
+    def search(self, text=None, filters=None, page=0, size=50, jwt=None):
         query_object = SearchQuery(text=text, filters=filters, page=page, size=size)
-        traverson = Traverson(self._url)
+        traverson = Traverson(self._url, jwt=jwt)
         response = traverson.follow("samples").get()
         if is_ok(response):
             response = requests.get(response.url, params=SearchQueryEncoder().default(query_object))
