@@ -2,7 +2,7 @@ import requests
 import logging
 import jwt
 import pytz
-from datetime import datetime
+from datetime import datetime, timedelta
 from .utilities import is_ok
 
 
