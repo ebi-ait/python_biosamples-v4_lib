@@ -1,6 +1,7 @@
 import requests
 import logging
 import jwt
+import pytz
 from datetime import datetime
 from .utilities import is_ok
 
@@ -34,8 +35,8 @@ class Client:
     @staticmethod
     def is_token_expired(token):
         decoded_token = Client.decode_token(token)
-        expiration_time = datetime.fromtimestamp(decoded_token['exp'])
-        return expiration_time < datetime.utcnow()
+        expiration_time = datetime.fromtimestamp(decoded_token['exp'], pytz.utc)
+        return expiration_time < datetime.now(pytz.utc)+timedelta(minutes=15)
 
     @staticmethod
     def decode_token(token):
