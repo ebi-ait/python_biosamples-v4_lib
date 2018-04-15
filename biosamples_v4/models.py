@@ -4,10 +4,11 @@ from .filters import _BioSamplesFilter
 
 
 class Sample:
-    def __init__(self, sample=None, name=None, release=datetime.utcnow(), update=datetime.utcnow(),
+    def __init__(self, sample=None, accession=None, name=None, release=datetime.utcnow(), update=datetime.utcnow(),
                  attributes=None, relationships=None, external_references=None, organizations=None, contacts=None,
                  publications=None, domain=None):
         self.sample = sample
+        self.accession = accession
         self.name = name
         self.release = release
         self.update = update

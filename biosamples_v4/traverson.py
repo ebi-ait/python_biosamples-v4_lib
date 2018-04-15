@@ -29,6 +29,7 @@ class Traverson:
     """
     Traverson object to conveniently navigate in a HAL+JSON api
     """
+
     def __init__(self, base_url, jwt=None):
         """
         Construct an instance of the traverson
@@ -103,8 +104,6 @@ class Traverson:
             else:
                 raise Exception("Couldn't find link {} on resource at {}".format(link, curr_url))
         return response
-
-
 
 
 class SampleSearchResultsPageNavigator:
