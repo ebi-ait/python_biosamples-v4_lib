@@ -4,7 +4,7 @@ import logging
 
 from .utilities import is_ok, is_successful
 from .exceptions import JWTMissingException
-from .traverson import Traverson
+from .traverson import Traverson, SampleSearchResultsPageNavigator, SampleSearchResultsCursor
 from .encoders import CurationEncoder, SearchQueryEncoder
 from .models import CurationLink, SearchQuery
 
@@ -100,7 +100,7 @@ class Client:
 
         response.raise_for_status()
 
-    def search(self, text=None, filters=None, page=0, size=50, jwt=None):
+    def search(self, text=None, filters=None, page=0, size=20, jwt=None):
         query_object = SearchQuery(text=text, filters=filters, page=page, size=size)
         traverson = Traverson(self._url, jwt=jwt)
         response = traverson.follow("samples").get()
@@ -110,4 +110,34 @@ class Client:
                 return response.json()
         response.raise_for_status()
 
+    def search_navigator(self, text=None, filters=None, page=0, size=20, jwt=None):
+        """
+        Return a search result in the form of navigator
+        :param text: the text to search for
+        :param filters: the filters to apply
+        :type filters: list
+        :param page: the starting page, default is 0
+        :type page: int
+        :param size: the number of results for page
+        :type size: int
+        :param jwt: the token to use for the search
+        :type jwt: str
+        :return: A page navigator for the results
+        :rtype SampleSearchResultsPageNavigator
+        """
+        return SampleSearchResultsPageNavigator(self.search(text=text, filters=filters, page=page, size=size, jwt=jwt))
 
+    def search_cursor(self, text=None, filters=None, size=20, jwt=None):
+        """
+        Return a search result in the form of cursor
+        :param text: the text to search for
+        :param filters: the filters to apply
+        :type filters: list
+        :param size: the number of results for page
+        :type size: int
+        :param jwt: the token to use for the search
+        :type jwt: str
+        :return: A cursor for the results
+        :rtype SampleSearchResultCursor
+        """
+        return SampleSearchResultsCursor(self.search(text=text, filters=filters, size=size, jwt=jwt))

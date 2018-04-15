@@ -46,7 +46,6 @@ class Relationship:
 class Curation:
     def __init__(self, attributes_pre=None, attributes_post=None,
                  external_references_pre=None, external_references_post=None):
-
         self.attr_pre = [] if attributes_pre is None else attributes_pre
         self.attr_post = [] if attributes_post is None else attributes_post
         self.rel_pre = [] if external_references_pre is None else external_references_pre
@@ -79,7 +78,7 @@ class SearchQuery:
                 self.filters.append(filters)
             else:
                 if not hasattr(filters, '__iter__'):
-                        raise Exception("Provided object is not iterable")
+                    raise Exception("Provided object is not iterable")
                 for f in filters:
                     if not isinstance(f, _BioSamplesFilter):
                         raise Exception("Provided object {} is not a BioSamplesFilter".format(f))
