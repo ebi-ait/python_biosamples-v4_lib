@@ -6,6 +6,9 @@ from .filters import _BioSamplesFilter
 
 
 class ISODateTimeEncoder(JSONEncoder):
+    """
+    JSON encoder for ISO DateTimes in BioSamples
+    """
     def default(self, o):
         if not isinstance(o, datetime):
             raise Exception("The provided object is not a datetime")
@@ -13,6 +16,9 @@ class ISODateTimeEncoder(JSONEncoder):
 
 
 class SampleEncoder(JSONEncoder):
+    """
+    JSON encoder for samples
+    """
     def default(self, o):
         if not isinstance(o, Sample):
             raise Exception("The provided object is not a Sample")
@@ -34,6 +40,9 @@ class SampleEncoder(JSONEncoder):
 
 
 class AttributeEncoder(JSONEncoder):
+    """
+    JSON encoder for Attributes
+    """
     def default(self, o):
         if not isinstance(o, Attribute):
             raise Exception("The provided object is not an Attribute")
@@ -47,6 +56,9 @@ class AttributeEncoder(JSONEncoder):
 
 
 class RelationshipEncoder(JSONEncoder):
+    """
+    JSON encoder for relationships
+    """
     def default(self, o):
         if not isinstance(o, Relationship):
             raise Exception("The provided object is not a Relationship")
@@ -58,7 +70,9 @@ class RelationshipEncoder(JSONEncoder):
 
 
 class AttributeListEncoder(JSONEncoder):
-
+    """
+    JSON encoder for attribute list
+    """
     def default(self, o):
 
         if not isinstance(o, list):
@@ -78,12 +92,18 @@ class AttributeListEncoder(JSONEncoder):
 
 
 class ExternalReferenceEncoder(JSONEncoder):
+    """
+    JSON encoder for ExternalReferences
+    """
     def default(self, o):
         _dict = {"url": o["url"]}
         return _dict
 
 
 class CurationEncoder(JSONEncoder):
+    """
+    JSON encoder for Curation objects
+    """
     def default(self, o):
         if not isinstance(o, Curation):
             return JSONEncoder.default(self, o)
@@ -97,6 +117,9 @@ class CurationEncoder(JSONEncoder):
 
 
 class CurationLinkEncoder(JSONEncoder):
+    """
+    JSON encoder for the CurationLink object
+    """
     def default(self, o):
         if not isinstance(o, CurationLink):
             return JSONEncoder.default(self, o)
@@ -110,6 +133,9 @@ class CurationLinkEncoder(JSONEncoder):
 
 
 class BiosamplesFilterEncoder(JSONEncoder):
+    """
+    Encoder for BioSamples filter
+    """
     def default(self, o):
         if not isinstance(o, _BioSamplesFilter):
             return JSONEncoder.default(self, o)
@@ -123,6 +149,9 @@ class BiosamplesFilterEncoder(JSONEncoder):
 
 
 class SearchQueryEncoder(JSONEncoder):
+    """
+    Encoder for the SearchQuery Object
+    """
     def default(self, o):
         if not isinstance(o, SearchQuery):
             return JSONEncoder.default(o)

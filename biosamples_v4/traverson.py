@@ -26,17 +26,15 @@ def get_hal_session(jwt=None):
 
 
 class Traverson:
+    """
+    Traverson object to conveniently navigate in a HAL+JSON api
+    """
     def __init__(self, base_url, jwt=None):
-        # session = requests.Session()
-        # session.headers.update({
-        #     "Accept": "application/hal+json",
-        #     "Content-Type": "application/hal+json"
-        # })
-        #
-        # if jwt is not None:
-        #     session.headers.update({
-        #         "Authorization": "Bearer {}".format(jwt)
-        #     })
+        """
+        Construct an instance of the traverson
+        :param base_url: the base url for the traverson
+        :param jwt: a JSON Web Token to use during navigation
+        """
 
         self.__param_regex = "{\?([A-Za-z0-9,]+)}"
         self.__session = get_hal_session(jwt)
@@ -44,6 +42,12 @@ class Traverson:
         self.__hops = []
 
     def populate_url(self, link, params):
+        """
+        method to generate an expanded version of a parameterized link
+        :param link: the paramaterized link
+        :param params: the params to use for the expantion
+        :return: the expanded url
+        """
         qp_match = re.search(self.__param_regex, link)
         query_params = []
         if qp_match:
@@ -60,11 +64,21 @@ class Traverson:
         return final_url
 
     def follow(self, link, params=None):
+        """
+        The link to follow from the current traverson state
+        :param link: the name of the link
+        :param params: the params to use for the link
+        :return: the traverson
+        """
         hop = {"link": link, "params": params}
         self.__hops.append(hop)
         return self
 
     def get(self):
+        """
+        Method to get the final result for the traverson
+        :return: the content of the final destination
+        """
         curr_url = self.__base_url
         logging.debug("Getting url {}".format(curr_url))
         response = self.__session.get(url=curr_url)
