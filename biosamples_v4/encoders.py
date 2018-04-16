@@ -2,7 +2,7 @@ from urllib import parse as urlencoder
 from json import JSONEncoder
 from datetime import datetime
 from .models import Sample, Attribute, Relationship, CurationLink, Curation, SearchQuery
-from .filters import _BioSamplesFilter
+from .filters import _BioSamplesFilter, _PredefinedFieldBioSamplesFilter
 
 
 class ISODateTimeEncoder(JSONEncoder):
@@ -141,11 +141,16 @@ class BiosamplesFilterEncoder(JSONEncoder):
             return JSONEncoder.default(self, o)
 
         encoded_value = o.get_value()
-        if o.get_target_field() is not None:
-            encoded_field = o.get_target_field()
-            return "{}:{}:{}".format(o.get_type(), encoded_field, encoded_value)
-        else:
+        if isinstance(o, _PredefinedFieldBioSamplesFilter):
             return "{}:{}".format(o.get_type(), encoded_value)
+        else:
+            if o.get_target_field() is None:
+                raise Exception("Error while encoding a not predefined target field filter")
+            encoded_field = o.get_target_field()
+            if encoded_value is None:
+                return "{}:{}".format(o.get_type(), encoded_field)
+            else:
+                return "{}:{}:{}".format(o.get_type(), encoded_field, encoded_value)
 
 
 class SearchQueryEncoder(JSONEncoder):
