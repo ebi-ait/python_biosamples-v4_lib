@@ -9,6 +9,14 @@ from .encoders import CurationEncoder, SearchQueryEncoder
 from .models import CurationLink, SearchQuery
 
 
+def _prepare_params(**kwargs):
+    params = {}
+    for k, v in kwargs.items():
+        if v is not None:
+            params[k] = v
+    return params
+
+
 class Client:
     """
     Client to interact with the BioSamples API.
@@ -22,9 +30,11 @@ class Client:
             raise Exception("You must provide the base url for the client to work")
         self._url = url
 
-    def fetch_sample(self, accession, jwt=None):
+    def fetch_sample(self, accession, curation_domains=None, jwt=None):
         """
         GET sample by accession
+        :param curation_domains: A list of curation domain to use when getting the samples
+        :type curation_domains: list or None
         :param accession: the accession of the samples, e.g. SAMEA123456
         :type accession: str
         :param jwt: the token to use to retrieve the sample when it's private
@@ -34,10 +44,16 @@ class Client:
         :raises Exception if the response is not 200
         """
         logging.debug("Getting sample with accession {} from {}".format(accession, self._url))
+
+        sample_params = _prepare_params(
+            accession=accession,
+            curationdomain=curation_domains
+        )
+
         traverson = Traverson(self._url, jwt=jwt)
         response = traverson \
             .follow("samples") \
-            .follow("sample", params={"accession": accession}) \
+            .follow("sample", params=sample_params) \
             .get()
         if is_ok(response):
             # return dict_to_sample(response.json())

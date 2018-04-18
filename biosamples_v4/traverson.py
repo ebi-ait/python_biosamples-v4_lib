@@ -59,7 +59,14 @@ class Traverson:
             query_string = []
             for qp in query_params:
                 if qp in params:
-                    query_string.append("{}={}".format(qp, params[qp]))
+                    if isinstance(params[qp], list):
+                        if len(params[qp]) == 0:
+                            query_string.append("{}=".format(qp))
+                        else:
+                            for val in params[qp]:
+                                query_string.append("{}={}".format(qp, val))
+                    else:
+                        query_string.append("{}={}".format(qp, params[qp]))
             if len(query_string) > 0:
                 final_url = final_url + "?" + "&".join(query_string)
         return final_url
