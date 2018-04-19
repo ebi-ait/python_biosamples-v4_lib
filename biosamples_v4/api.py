@@ -33,12 +33,12 @@ class Client:
     def fetch_sample(self, accession, curation_domains=None, jwt=None):
         """
         GET sample by accession
-        :param curation_domains: A list of curation domain to use when getting the samples
-        :type curation_domains: list or None
         :param accession: the accession of the samples, e.g. SAMEA123456
         :type accession: str
         :param jwt: the token to use to retrieve the sample when it's private
         :type jwt: str
+        :param curation_domains: A list of curation domain to use when getting the samples
+        :type curation_domains: list or None
         :return: the sample in json format
         :rtype: dict
         :raises Exception if the response is not 200
@@ -60,6 +60,19 @@ class Client:
             return response.json()
 
         raise response.raise_for_status()
+
+    def fetch_raw(self, accession, jwt=None):
+        """
+        GET sample by accession without any curation applied
+        :param accession: the accession of the samples, e.g. SAMEA123456
+        :type accession: str
+        :param jwt: the token to use to retrieve the sample when it's private
+        :type jwt: str
+        :return: the sample in json format
+        :rtype: dict
+        :raises Exception if the response is not 200
+        """
+        return self.fetch_sample(accession=accession, jwt=jwt, curation_domains=[])
 
     def persist_sample(self, sample, jwt=None):
         """
