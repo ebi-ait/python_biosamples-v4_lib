@@ -4,56 +4,42 @@ import logging
 from .utilities import is_ok
 
 
-def get_hal_session(jwt=None):
-    """
-    Generate a hal+json session to use for BioSamples including a potential JWT token
-    :param jwt: optional JWT tokent to embed in the session
-    :type jwt: str
-    :return: a request session with hal+json headers and optional authorization header
-    :rtype: Session
-    """
-    session = requests.Session()
-    session.headers.update({
-        "Accept": "application/hal+json",
-        "Content-Type": "application/hal+json"
-    })
+class Utils:
 
-    if jwt is not None:
+    @staticmethod
+    def get_hal_session(jwt=None):
+        """
+        Generate a hal+json session to use for BioSamples including a potential JWT token
+        :param jwt: optional JWT tokent to embed in the session
+        :type jwt: str
+        :return: a request session with hal+json headers and optional authorization header
+        :rtype: Session
+        """
+        session = requests.Session()
         session.headers.update({
-            "Authorization": "Bearer {}".format(jwt)
+            "Accept": "application/hal+json",
+            "Content-Type": "application/hal+json"
         })
-    return session
 
+        if jwt is not None:
+            session.headers.update({
+                "Authorization": "Bearer {}".format(jwt)
+            })
+        return session
 
-class Traverson:
-    """
-    Traverson object to conveniently navigate in a HAL+JSON api
-    """
-
-    def __init__(self, base_url, jwt=None):
-        """
-        Construct an instance of the traverson
-        :param base_url: the base url for the traverson
-        :param jwt: a JSON Web Token to use during navigation
-        """
-
-        self.__param_regex = "{\?([A-Za-z0-9,]+)}"
-        self.__session = get_hal_session(jwt)
-        self.__base_url = base_url
-        self.__hops = []
-
-    def populate_url(self, link, params):
+    @staticmethod
+    def populate_url(link, params, params_regex='{\?([A-Za-z0-9,]+)}'):
         """
         method to generate an expanded version of a parameterized link
         :param link: the paramaterized link
         :param params: the params to use for the expantion
         :return: the expanded url
         """
-        qp_match = re.search(self.__param_regex, link)
+        qp_match = re.search(params_regex, link)
         query_params = []
         if qp_match:
             query_params = qp_match.group(1).split(",")
-        final_url = re.sub(self.__param_regex, "", link)
+        final_url = re.sub(params_regex, "", link)
         final_url = final_url.format(**params)
         if len(query_params) > 0:
             query_string = []
@@ -70,6 +56,23 @@ class Traverson:
             if len(query_string) > 0:
                 final_url = final_url + "?" + "&".join(query_string)
         return final_url
+
+
+class Traverson:
+    """
+    Traverson object to conveniently navigate in a HAL+JSON api
+    """
+
+    def __init__(self, base_url, jwt=None):
+        """
+        Construct an instance of the traverson
+        :param base_url: the base url for the traverson
+        :param jwt: a JSON Web Token to use during navigation
+        """
+
+        self.__session = Utils.get_hal_session(jwt)
+        self.__base_url = base_url
+        self.__hops = []
 
     def follow(self, link, params=None):
         """
@@ -100,7 +103,7 @@ class Traverson:
                 curr_url = content["_links"][link]["href"]
                 # if hop["params"] is not None:
                 if "templated" in content["_links"][link]:
-                    curr_url = self.populate_url(curr_url, hop["params"])
+                    curr_url = Utils.populate_url(curr_url, hop["params"])
                 logging.debug("Getting url {}".format(curr_url))
                 response = self.__session.get(url=curr_url)
                 if not is_ok(response):
@@ -121,7 +124,7 @@ class SampleSearchResultsPageNavigator:
 
     def __init__(self, page):
         self.first_page = page
-        self.session = get_hal_session()
+        self.session = Utils.get_hal_session()
         self.total_elements = page['page']['totalElements'] - page['page']['number'] * page['page'][
             'size']
         self._update_status(page)
@@ -160,7 +163,7 @@ class SampleSearchResultsCursor:
     def __init__(self, page):
         if 'cursor' not in page['_links']:
             raise Exception("The search results don't contain a cursor")
-        self.session = get_hal_session()
+        self.session = Utils.get_hal_session()
         response = self.session.get(page['_links']['cursor']['href'])
         if is_ok(response):
             self.total_elements = page['page']['totalElements']
