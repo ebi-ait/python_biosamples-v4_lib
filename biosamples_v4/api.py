@@ -1,5 +1,4 @@
 import requests
-from requests import RequestException
 import logging
 
 from .utilities import is_ok, is_successful
