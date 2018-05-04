@@ -1,6 +1,18 @@
 import requests
 import os
 
+
+def _ensure_output_uniqueness(file):
+    """
+    Given a file path, verifies file doesn't exist
+    :param file: the file path to check
+    :raises FileExistsError if the provided path already exists
+    """
+    if file:
+        if os.path.isfile(file):
+            raise FileExistsError('Output file already exists! Rename the file or use a different output file')
+
+
 class BaseClient:
 
     def __init__(self, url):
@@ -12,38 +24,55 @@ class BaseClient:
     def url(self):
         return "{}/api/v1/file/{}".format(self._baseurl, self._endpoint())
 
-    def submit(self, input_file, **kwargs):
+    def submit(self, **kwargs):
+        if kwargs.get('file'):
+            input_file = kwargs.pop('file')
+            with open(input_file, 'rb') as fin:
+                return self._submit(fin, **kwargs)
+
+        elif kwargs.get('json'):
+            json_content = kwargs.pop('json')
+            content = BaseClient.convert_json_matrix_to_sampletab(json_content)
+            return self._submit(content, **kwargs)
+
+        elif kwargs.get('content'):
+            text_content = kwargs.pop('content')
+            return self._submit(text_content, **kwargs)
+
+        else:
+            raise ValueError('file|json|content argument are missing')
+
+    def _submit(self, content, **kwargs):
         output_file = kwargs.get('output_file', None)
         apikey = kwargs.get('apikey', None)
 
         self._check_apikey(apikey)
 
-        BaseClient._ensure_output_uniqueness(output_file)
+        _ensure_output_uniqueness(output_file)
 
-        with open(input_file, 'rb') as sampletab_file:
-            files = {'file': sampletab_file}
-            params = dict()
-            if apikey:
-                params['apikey'] = apikey
+        files = {'file': content}
+        params = dict()
+        if apikey:
+            params['apikey'] = apikey
 
-            res = self._send(files, params=params)
-            if res.ok:
-                submission_errors = res.json().get('errors')
-                if len(submission_errors) > 0:
-                    raise ValueError('Some errors occurred while sumbitting sampletab', submission_errors)
+        res = self._send(files, params=params)
+        if res.ok:
+            submission_errors = res.json().get('errors')
+            if len(submission_errors) > 0:
+                raise ValueError('Some errors occurred while sumbitting sampletab', submission_errors)
 
-                final_sampletab = res.json().get('sampletab')
+            final_sampletab = res.json().get('sampletab')
 
-                if output_file:
-                    BaseClient._save_sampletab_to_file(final_sampletab, output_file)
+            if output_file:
+                BaseClient._save_sampletab_to_file(final_sampletab, output_file)
 
-                return res.json()
+            return res.json()
 
-            else:
-                res.raise_for_status()
+        else:
+            res.raise_for_status()
 
     def _send(self, files, **kwargs):
-        return requests.post(self.url, files=files, **kwargs)
+        return requests.post(self.url, files=files, params=kwargs.get('params'))
 
     def _endpoint(self):
         raise NotImplementedError("This method need to be implemented in a subclass")
@@ -56,18 +85,19 @@ class BaseClient:
     @staticmethod
     def _save_sampletab_to_file(sampletab_json, output_file):
         with open(output_file, 'w') as file_out:
-            for line in BaseClient.convert_json_matrix_to_sampletab(sampletab_json):
-                file_out.write("{}{}".format(line, os.linesep))
-
-    @staticmethod
-    def _ensure_output_uniqueness(file):
-        if file:
-            if os.path.isfile(file):
-                raise FileExistsError('Output file already exists! Rename the file or use a different output file')
+            file_out.write(BaseClient.convert_json_matrix_to_sampletab(sampletab_json))
 
     @staticmethod
     def convert_json_matrix_to_sampletab(json_matrix):
-        return ['\t'.join(line) for line in json_matrix]
+        return os.linesep.join(['\t'.join(line) for line in json_matrix])
+
+    @staticmethod
+    def sampletab_to_json_matrix(sampletab_file):
+        json_matrix = list()
+        for line in sampletab_file:
+            json_line = line.replace('\n', '').split("\t")
+            json_matrix.append(json_line)
+        return json_matrix
 
 
 class ValidationClient(BaseClient):
@@ -90,70 +120,3 @@ class AccessionClient(BaseClient):
     def _endpoint(self):
         return "ac"
 
-# def submit(self, input_file, apikey, output_file=None):
-#
-#     Client._ensure_output_uniqueness(output_file)
-#
-#     if apikey is None:
-#         raise ValueError('You must provide an apikey to submit a sampletab')
-#     with open(input_file, 'rb') as sampletab_file:
-#         files = {
-#             'file': sampletab_file
-#         }
-#         params = {
-#             'apikey': apikey
-#         }
-#         res = requests.post(self._submit_url, files=files, params=params)
-#         if res.ok:
-#             submission_errors = res.json().get('errors')
-#             if len(submission_errors) > 0:
-#                 raise ValueError('Some errors occurred while sumbitting sampletab', submission_errors)
-#
-#             final_sampletab = res.json().get('sampletab')
-#
-#             if output_file:
-#                 Client._save_sampletab_to_file(final_sampletab, output_file)
-#
-#             return res.json()
-#         else:
-#             res.raise_for_status()
-#
-# def accession(self, input_file, apikey, output_file=None):
-#     '''
-#     Assigns accessions to samples; This does not submit any sample metadata but
-#     returns the assigned accessions immediately
-#     :param input_file: path to the input file
-#     :type input_file: str
-#     :param apikey: apikey to use for the sumbission
-#     :type apikey: str
-#     :param output_file: path to the output file
-#     :type output_file: str
-#     :raise
-#     :return:
-#     '''
-#
-#     Client._ensure_output_uniqueness(output_file)
-#
-#     if apikey is None:
-#         raise ValueError('You must provide an apikey to submit a sampletab')
-#     with open(input_file, 'rb') as sampletab_file:
-#         files = {
-#             'file': sampletab_file
-#         }
-#         params = {
-#             'apikey': apikey
-#         }
-#         res = requests.post(self._accession_url, files=files, params=params)
-#         if res.ok:
-#             submission_errors = res.json().get('errors')
-#             if len(submission_errors) > 0:
-#                 raise ValueError('Some errors occurred while sumbitting sampletab', submission_errors)
-#
-#             final_sampletab = res.json().get('sampletab')
-#
-#             if output_file:
-#                 Client._save_sampletab_to_file(final_sampletab, output_file)
-#
-#             return res.json()
-#         else:
-#             res.raise_for_status()
