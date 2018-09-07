@@ -13,6 +13,20 @@ def _ensure_output_uniqueness(file):
             raise FileExistsError('Output file already exists! Rename the file or use a different output file')
 
 
+class Utilities:
+    @staticmethod
+    def convert_json_matrix_to_sampletab(json_matrix):
+        return os.linesep.join(['\t'.join(line) for line in json_matrix])
+
+    @staticmethod
+    def sampletab_to_json_matrix(sampletab_file):
+        json_matrix = list()
+        for line in sampletab_file:
+            json_line = line.replace('\n', '').split("\t")
+            json_matrix.append(json_line)
+        return json_matrix
+
+
 class BaseClient:
 
     def __init__(self, url):
@@ -32,12 +46,12 @@ class BaseClient:
 
         elif kwargs.get('json'):
             json_content = kwargs.pop('json')
-            content = BaseClient.convert_json_matrix_to_sampletab(json_content)
+            content = Utilities.convert_json_matrix_to_sampletab(json_content)
             return self._submit(content, **kwargs)
 
         elif kwargs.get('content'):
-            text_content = kwargs.pop('content')
-            return self._submit(text_content, **kwargs)
+            content = kwargs.pop('content')
+            return self._submit(content, **kwargs)
 
         else:
             raise ValueError('file|json|content argument are missing')
@@ -85,19 +99,7 @@ class BaseClient:
     @staticmethod
     def _save_sampletab_to_file(sampletab_json, output_file):
         with open(output_file, 'w') as file_out:
-            file_out.write(BaseClient.convert_json_matrix_to_sampletab(sampletab_json))
-
-    @staticmethod
-    def convert_json_matrix_to_sampletab(json_matrix):
-        return os.linesep.join(['\t'.join(line) for line in json_matrix])
-
-    @staticmethod
-    def sampletab_to_json_matrix(sampletab_file):
-        json_matrix = list()
-        for line in sampletab_file:
-            json_line = line.replace('\n', '').split("\t")
-            json_matrix.append(json_line)
-        return json_matrix
+            file_out.write(Utilities.convert_json_matrix_to_sampletab(sampletab_json))
 
 
 class ValidationClient(BaseClient):
@@ -119,4 +121,3 @@ class AccessionClient(BaseClient):
 
     def _endpoint(self):
         return "ac"
-

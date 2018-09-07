@@ -16,6 +16,26 @@ def _prepare_params(**kwargs):
     return params
 
 
+def _clean_sample(sample, fields=None):
+    """
+    Clean a sample resource from unnecessary fields
+
+    :param sample: the sample to clean
+    :type sample: dict
+    :return: Sample cleaned from unnecessary params
+    :rtype: dict
+    """
+
+    if fields is None:
+        fields = ['_links', 'releaseDate', 'updateDate', 'taxId']
+
+    for f in fields:
+        if f in sample:
+            del sample[f]
+
+    return sample
+
+
 class Client:
     """
     Client to interact with the BioSamples API.
@@ -32,6 +52,7 @@ class Client:
     def fetch_sample(self, accession, curation_domains=None, jwt=None):
         """
         GET sample by accession
+
         :param accession: the accession of the samples, e.g. SAMEA123456
         :type accession: str
         :param jwt: the token to use to retrieve the sample when it's private
@@ -40,7 +61,7 @@ class Client:
         :type curation_domains: list or None
         :return: the sample in json format
         :rtype: dict
-        :raises Exception if the response is not 200
+        :raises: Exception if the response is not 200
         """
         logging.debug("Getting sample with accession {} from {}".format(accession, self._url))
 
@@ -63,28 +84,31 @@ class Client:
     def fetch_raw(self, accession, jwt=None):
         """
         GET sample by accession without any curation applied
+
         :param accession: the accession of the samples, e.g. SAMEA123456
         :type accession: str
         :param jwt: the token to use to retrieve the sample when it's private
         :type jwt: str
         :return: the sample in json format
         :rtype: dict
-        :raises Exception if the response is not 200
+        :raises: Exception if the response is not 200
         """
         return self.fetch_sample(accession=accession, jwt=jwt, curation_domains=[])
 
     def persist_sample(self, sample, jwt=None):
         """
         POST new sample to biosample
+
         :param sample: the sample to POST
         :type sample: dict
         :param jwt: the token to use to store the sample
         :type jwt: str
         :return: the stored sample including the provided accession
         :rtype: dict
-        :raises Exception if the response is not successful
+        :raises: Exception if the response is not successful
         """
         logging.debug("Submitting new sample to {}".format(self._url))
+
         if jwt is None:
             raise JWTMissingException
         traverson = Traverson(self._url, jwt=jwt)
@@ -97,7 +121,7 @@ class Client:
                 "Authorization": "Bearer {}".format(jwt),
                 "Content-Type": "application/json"
             }
-            response = requests.post(response.url, json=sample, headers=headers)
+            response = requests.post(response.url, json=_clean_sample(sample), headers=headers)
             if is_successful(response):
                 return response.json()
 
@@ -106,13 +130,14 @@ class Client:
     def update_sample(self, sample, jwt=None):
         """
         PUT (Update) sample in BioSamples
+
         :param sample: the sample to update
         :type sample: dict
         :param jwt: the token to use for the update
         :type jwt: str
         :return: the updated sample
-        :rtype dict
-        :raises Exception if the response is not successful
+        :rtype: dict
+        :raises: Exception if the response is not successful
         """
         # TODO: update the real samples
         logging.debug("Updating sample with accession {} on {}".format(sample["accession"], self._url))
@@ -131,7 +156,7 @@ class Client:
                 "Authorization": "Bearer {}".format(jwt),
                 "Content-Type": "application/json"
             }
-            response = requests.put(response.url, json=sample, headers=headers)
+            response = requests.put(response.url, json=_clean_sample(sample), headers=headers)
             if is_successful(response):
                 return response.json()
 
@@ -140,12 +165,14 @@ class Client:
     def curate_sample(self, sample, curation_object, domain, jwt=None):
         """
         Generate a curationLink between a sample and a curation object using a specific domain
+
         :param sample: the sample to curate
         :param curation_object: the curation object to apply
         :param domain: the domain to use for the curation action
         :param jwt: the token to authorize the curation
         :return: The generated curation link
-        :raises Exception if is not possible to find the curationLinks link or
+        :rtype: dict
+        :raises: Exception if is not possible to find the curationLinks link or
         storing the curation link wasn't successful
         """
         logging.debug("Curating sample {} on {}".format(sample['accession'], self._url))
@@ -177,6 +204,7 @@ class Client:
     def search(self, text=None, filters=None, page=0, size=20, jwt=None):
         """
         Search for samples using a specific text, filters
+
         :param text: the text to search for
         :type text: str
         :param filters: the list of filters to add to the search query
@@ -189,7 +217,7 @@ class Client:
         :type jwt: str
         :return: the first page of the search result
         :rtype: dict
-        :raises Exception if the search wasn't successful
+        :raises: Exception if the search wasn't successful
         """
         query_object = SearchQuery(text=text, filters=filters, page=page, size=size)
         traverson = Traverson(self._url, jwt=jwt)
@@ -203,6 +231,7 @@ class Client:
     def search_navigator(self, text=None, filters=None, page=0, size=20, jwt=None):
         """
         Return a search result in the form of navigator
+
         :param text: the text to search for
         :param filters: the filters to apply
         :type filters: list
@@ -213,13 +242,14 @@ class Client:
         :param jwt: the token to use for the search
         :type jwt: str
         :return: A page navigator for the results
-        :rtype SampleSearchResultsPageNavigator
+        :rtype: SampleSearchResultsPageNavigator
         """
         return SampleSearchResultsPageNavigator(self.search(text=text, filters=filters, page=page, size=size, jwt=jwt))
 
     def search_cursor(self, text=None, filters=None, size=20, jwt=None):
         """
         Return a search result in the form of cursor
+
         :param text: the text to search for
         :param filters: the filters to apply
         :type filters: list
@@ -228,6 +258,6 @@ class Client:
         :param jwt: the token to use for the search
         :type jwt: str
         :return: A cursor for the results
-        :rtype SampleSearchResultCursor
+        :rtype: SampleSearchResultCursor
         """
         return SampleSearchResultsCursor(self.search(text=text, filters=filters, size=size, jwt=jwt))
