@@ -65,16 +65,18 @@ class Client:
         """
         logging.debug("Getting sample with accession {} from {}".format(accession, self._url))
 
-        sample_params = _prepare_params(
-            accession=accession,
-            curationdomain=curation_domains
-        )
+        sample_params = _prepare_params(accession=accession)
 
         traverson = Traverson(self._url, jwt=jwt)
-        response = traverson \
+        traverson \
             .follow("samples") \
-            .follow("sample", params=sample_params) \
-            .get()
+            .follow("sample", params=sample_params)
+
+        if curation_domains is not None:
+            curation_params = _prepare_params(curationdomain=curation_domains)
+            traverson.follow("curationDomain", params=curation_params)
+
+        response = traverson.get()
         if is_ok(response):
             # return dict_to_sample(response.json())
             return response.json()
