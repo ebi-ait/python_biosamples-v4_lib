@@ -29,8 +29,7 @@ setup(
     packages=find_packages(exclude=['contrib', 'docs', 'tests']),
     project_urls={
         'Bug Reports': 'https://github.com/Kerruba/python_biosamples-v4_lib/issues',
-        # 'Say Thanks!': 'http://saythanks.io/to/example',
         'Source': 'https://github.com/Kerruba/python_biosamples-v4_lib',
     },
-    install_requires=['PyJWT', 'requests']
+    install_requires=['pyjwt', 'requests', 'pytz']
 )
