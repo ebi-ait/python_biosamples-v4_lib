@@ -22,6 +22,10 @@ def is_ok(response):
     return response.status_code == requests.codes.ok
 
 
+def is_not_found(response):
+    return is_status(response, 404)
+
+
 def is_successful(response):
     return ("{:d}".format(response.status_code)).startswith("2")
 

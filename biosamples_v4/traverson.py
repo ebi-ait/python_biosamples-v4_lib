@@ -1,7 +1,10 @@
 import requests
+import requests_cache
 import re
 import logging
 from .utilities import is_ok
+
+requests_cache.install_cache(cache_name='biosamples-cache', backend='sqlite', expire_after=180)
 
 
 class Utils:

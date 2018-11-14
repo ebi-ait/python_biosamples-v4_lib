@@ -1,7 +1,7 @@
 import requests
 import logging
 
-from .utilities import is_ok, is_successful
+from .utilities import is_ok, is_successful, is_not_found
 from .exceptions import JWTMissingException
 from .traverson import Traverson, SampleSearchResultsPageNavigator, SampleSearchResultsCursor
 from .encoders import CurationEncoder, SearchQueryEncoder
