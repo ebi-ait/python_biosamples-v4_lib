@@ -19,7 +19,7 @@ with open(path.join(here, 'README.md'), encoding='utf-8') as f:
 
 setup(
     name='biosamples_v4',
-    version='0.0.3',
+    version='0.0.4',
     description='A lib to interact with BioSamples-v4 API',
     long_description=long_description,
     long_description_content_type='text/markdown',
@@ -31,5 +31,5 @@ setup(
         'Bug Reports': 'https://github.com/Kerruba/python_biosamples-v4_lib/issues',
         'Source': 'https://github.com/Kerruba/python_biosamples-v4_lib',
     },
-    install_requires=['pyjwt', 'requests', 'pytz']
+    install_requires=['pyjwt', 'requests', 'pytz', 'requests_cache']
 )

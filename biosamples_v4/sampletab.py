@@ -98,7 +98,7 @@ class BaseClient:
 
     @staticmethod
     def _save_sampletab_to_file(sampletab_json, output_file):
-        with open(output_file, 'w') as file_out:
+        with open(output_file, 'w', encoding='utf-8') as file_out:
             file_out.write(Utilities.convert_json_matrix_to_sampletab(sampletab_json))
 
 
