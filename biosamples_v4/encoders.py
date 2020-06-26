@@ -24,18 +24,21 @@ class SampleEncoder(JSONEncoder):
             raise Exception("The provided object is not a Sample")
 
         attribute_list_encoder = AttributeListEncoder()
-        relatioship_encoder = RelationshipEncoder()
+        relationship_encoder = RelationshipEncoder()
         datetime_encoder = ISODateTimeEncoder()
 
         _dict = dict()
         _dict["accession"] = o.accession
+        _dict["name"] = o.name
+        _dict["domain"] = o.domain
         _dict["release"] = datetime_encoder.default(o.release)
         _dict["update"] = datetime_encoder.default(o.update)
         _dict["characteristics"] = attribute_list_encoder.default(o.attributes)
-        _dict["relationships"] = [relatioship_encoder.default(rel) for rel in o.relations]
+        _dict["relationships"] = [relationship_encoder.default(rel) for rel in o.relations]
         _dict["externalReferences"] = o.external_references
         _dict["organization"] = o.organizations
         _dict["contact"] = o.contacts
+        _dict["taxId"] = o.taxon_id
         return _dict
 
 

@@ -6,7 +6,7 @@ from .filters import _BioSamplesFilter
 class Sample:
     def __init__(self, sample=None, accession=None, name=None, release=datetime.utcnow(), update=datetime.utcnow(),
                  attributes=None, relationships=None, external_references=None, organizations=None, contacts=None,
-                 publications=None, domain=None):
+                 publications=None, domain=None, taxon_id=None):
         self.sample = sample
         self.accession = accession
         self.name = name
@@ -19,6 +19,7 @@ class Sample:
         self.organizations = [] if organizations is None else organizations
         self.contacts = [] if contacts is None else contacts
         self.publications = [] if publications is None else publications
+        self.taxon_id = 0 if taxon_id is None else taxon_id
 
     def __str__(self):
         return "Sample {}".format(self.accession)
