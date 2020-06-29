@@ -6,6 +6,8 @@ to access BioSamples v4 new API.
 The client is still under heavy development, so any contribution is very
 well welcomed.
 
+This is a test project and not officially supported by the AIT or BioSamples teams at this time.
+
 ## Local Development
 This project uses [pipenv](https://pypi.python.org/pypi/pipenv) to handle
 both the virtual environment and the dependencies.
