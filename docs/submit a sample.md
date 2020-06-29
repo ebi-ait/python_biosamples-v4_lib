@@ -75,16 +75,6 @@ aap_explore_client.get_user_details()
 ```
 
 
-
-
-    {'userName': 'mshadbolt_dev',
-     'email': 'mshadbolt@ebi.ac.uk',
-     'userReference': 'usr-8791cec4-da80-41d1-b3b0-d8e96a7af318',
-     '_links': {'self': {'href': 'https://explore.api.aai.ebi.ac.uk/users/usr-8791cec4-da80-41d1-b3b0-d8e96a7af318'}}}
-
-
-
-
 ```python
 aap_explore_client.get_user_membership_domains()
 ```
