@@ -1,28 +1,74 @@
 import logging
 from datetime import datetime
 from .filters import _BioSamplesFilter
+import requests
+from urllib.parse import quote
+import json
 
 
 class Sample:
     def __init__(self, sample=None, accession=None, name=None, release=datetime.utcnow(), update=datetime.utcnow(),
                  attributes=None, relationships=None, external_references=None, organizations=None, contacts=None,
-                 publications=None, domain=None, taxon_id=None):
+                 publications=None, domain=None, species=None, ncbi_taxon_id=None):
         self.sample = sample
         self.accession = accession
         self.name = name
         self.release = release
         self.update = update
         self.domain = domain
+        self.species = species
+        self.ncbi_taxon_id = str(ncbi_taxon_id) if ncbi_taxon_id is not None else ncbi_taxon_id
         self.attributes = [] if attributes is None else attributes
         self.relations = [] if relationships is None else relationships
         self.external_references = [] if external_references is None else external_references
         self.organizations = [] if organizations is None else organizations
         self.contacts = [] if contacts is None else contacts
         self.publications = [] if publications is None else publications
-        self.taxon_id = 0 if taxon_id is None else taxon_id
+
+        self._store_organism_info()
 
     def __str__(self):
         return "Sample {}".format(self.accession)
+
+    def _store_organism_info(self):
+        ena_species_lookup_base = "http://www.ebi.ac.uk/ena/data/taxonomy/v1/taxon/scientific-name/"
+        ena_taxid_lookup_base = "http://www.ebi.ac.uk/ena/data/taxonomy/v1/taxon/tax-id/"
+        if self.species is not None and self.ncbi_taxon_id is None:
+            self.species = self.species.capitalize()
+            response = requests.get(ena_species_lookup_base + quote(self.species))
+            response_json = json.loads(response.content)
+            if isinstance(response_json, list):
+                response_json = response_json[0]
+            print("Found taxon for species " + self.species + " with ncbi taxon id " + response_json["taxId"])
+            self.ncbi_taxon_id = response_json["taxId"]
+        elif self.species is None and self.ncbi_taxon_id is not None:
+            response = requests.get(ena_taxid_lookup_base + quote(self.ncbi_taxon_id))
+            response_json = json.loads(response.content)
+            if isinstance(response_json, list):
+                response_json = response_json[0]
+            print("Found species for taxon " + self.ncbi_taxon_id + " with species " + response_json["scientificName"])
+            self.species = response_json["scientificName"]
+        elif self.species is not None and self.ncbi_taxon_id is not None:
+            self.species = self.species.capitalize()
+            species_response = requests.get(ena_species_lookup_base + quote(self.species))
+            species_response_json = json.loads(species_response.content)
+            if isinstance(species_response_json, list):
+                species_response_json = species_response_json[0]
+            taxid_response = requests.get(ena_taxid_lookup_base + quote(self.ncbi_taxon_id))
+            taxid_response_json = json.loads(taxid_response.content)
+            if isinstance(taxid_response_json, list):
+                taxid_response_json = taxid_response_json[0]
+            if species_response_json["taxId"] == str(self.ncbi_taxon_id):
+                print("Taxon ids are consistent")
+            else:
+                print("Information is not consistent between " + self.species + " and " + str(self.ncbi_taxon_id))
+            if taxid_response_json["scientificName"] == self.species:
+                print("Species information is consistent")
+            else:
+                print("Information is not consistent between " + self.species + " and " + str(self.ncbi_taxon_id) +
+                      ". Please check information and re-run method")
+        else:
+            print("Without either species or ncbi_taxon_id cannot determine organism info, please set one of these")
 
 
 class Attribute:
