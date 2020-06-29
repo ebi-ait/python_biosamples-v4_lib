@@ -71,13 +71,23 @@ class Sample:
             print("Without either species or ncbi_taxon_id cannot determine organism info, please set one of these")
 
 
+    def _append_organism_attribute(self):
+        if self.species is not None and self.ncbi_taxon_id is not None:
+            self.attributes.append(Attribute(name="organism",
+                                             value=self.species,
+                                             iris="http://purl.obolibrary.org/obo/NCBITaxon_" + self.ncbi_taxon_id))
+
+
+
+
 class Attribute:
+    # TODO: make sure if list of iris supplied still 1d list of iris is returned
     def __init__(self, name=None, value=None, iris=None, unit=None):
         if name is None or value is None:
             raise Exception("Attribute need at least a type and a value")
         self.name = name
         self.value = value
-        self.iris = [] if iris is None else iris
+        self.iris = [] if iris is None else [iris]
         self.unit = unit
 
 
