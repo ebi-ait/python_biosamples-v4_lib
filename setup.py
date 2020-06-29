@@ -13,15 +13,16 @@ from os import path
 here = path.abspath(path.dirname(__file__))
 
 # Get the long description from the README file
-with open(path.join(here, 'README.md'), encoding='utf-8') as f:
-    long_description = f.read()
+# with open(path.join(here, 'README.md'), encoding='utf-8') as f:
+#     long_description = f.read()
 
 
 setup(
     name='biosamples_v4',
-    version='0.0.5',
+    version='1.0.0',
     description='A lib to interact with BioSamples-v4 API',
-    long_description=long_description,
+    long_description="A library with functions to wrap the BioSamples API - "
+                     "https://wwwdev.ebi.ac.uk/biosamples/docs/guides/submit",
     long_description_content_type='text/markdown',
     author="Luca Cherubin",
     author_email="cherubin@ebi.ac.uk",
