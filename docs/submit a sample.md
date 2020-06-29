@@ -109,6 +109,7 @@ aap_explore_client.get_user_managed_domains()
 
 ### Prod BioSamples API
 
+#### Fetch a sample in the Prod Biosamples instance
 
 ```python
 bs_api_client = biosamples_v4.api.Client("https://www.ebi.ac.uk/biosamples")
@@ -122,6 +123,7 @@ bs_api_client.fetch_sample(accession="SAMEA6913455",
 
 ### Dev Biosamples API
 
+#### Submit a sample in the dev BioSamples instance
 
 ```python
 bs_dev_api_client = biosamples_v4.api.Client("https://wwwdev.ebi.ac.uk/biosamples")
