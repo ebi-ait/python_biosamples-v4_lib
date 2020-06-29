@@ -28,8 +28,8 @@ class SampleEncoder(JSONEncoder):
         datetime_encoder = ISODateTimeEncoder()
 
         _dict = dict()
-        _dict["accession"] = o.accession
         _dict["name"] = o.name
+        _dict["accession"] = o.accession
         _dict["domain"] = o.domain
         _dict["release"] = datetime_encoder.default(o.release)
         _dict["update"] = datetime_encoder.default(o.update)
@@ -38,7 +38,7 @@ class SampleEncoder(JSONEncoder):
         _dict["externalReferences"] = o.external_references
         _dict["organization"] = o.organizations
         _dict["contact"] = o.contacts
-        _dict["taxId"] = o.taxon_id
+
         return _dict
 
 
@@ -53,7 +53,7 @@ class AttributeEncoder(JSONEncoder):
         _dict = dict()
         _dict["type"] = o.name
         _dict["text"] = o.value
-        _dict["iri"] = o.iris
+        _dict["ontologyTerms"] = o.iris
         _dict["unit"] = o.unit
         return _dict
 
@@ -173,3 +173,6 @@ class SearchQueryEncoder(JSONEncoder):
         _dict['page'] = o.page
         _dict['size'] = o.size
         return _dict
+
+
+
