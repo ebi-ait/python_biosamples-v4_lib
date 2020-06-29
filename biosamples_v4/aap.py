@@ -119,11 +119,11 @@ class Client:
             if is_ok(response):
                 logging.debug("Got token correctly")
                 self.token = response.text
-                return print("Got new token starting with " + self.token[0:10] + "and stored in self.token ")
+                return self.token
             return response.raise_for_status()
         else:
             logging.debug("Using cached token for user {} taken from url {}".format(self.username, self.auth_url))
-            return print("Using cached token.")
+            return self.token
 
     @staticmethod
     def is_token_expired(token):
