@@ -2,17 +2,21 @@ class JWTMissingException(Exception):
     pass
 
 
-class ConvertionException(Exception):
+class ConversionException(Exception):
     pass
 
 
-class SampleConvertionException(ConvertionException):
+class SampleConversionException(ConversionException):
     pass
 
 
-class AttributeConvertionException(ConvertionException):
+class AttributeConversionException(ConversionException):
     pass
 
 
-class RelationshipConvertionException(ConvertionException):
+class RelationshipConversionException(ConversionException):
+    pass
+
+
+class OrganismInformationIncompleteException(Exception):
     pass
