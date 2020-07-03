@@ -4,6 +4,7 @@ from .filters import _BioSamplesFilter
 import requests
 from urllib.parse import quote
 import json
+from .exceptions import *
 
 
 class Sample:
@@ -26,6 +27,7 @@ class Sample:
         self.publications = [] if publications is None else publications
 
         self._store_organism_info()
+        self._append_organism_attribute()
 
     def __str__(self):
         return "Sample {}".format(self.accession)
@@ -68,7 +70,8 @@ class Sample:
                 print("Information is not consistent between " + self.species + " and " + str(self.ncbi_taxon_id) +
                       ". Please check information and re-run method")
         else:
-            print("Without either species or ncbi_taxon_id cannot determine organism info, please set one of these")
+            raise OrganismInformationIncompleteException("One of species or taxon ID need to be set in order to "
+                                                         "complete organism information.")
 
 
     def _append_organism_attribute(self):
@@ -76,8 +79,9 @@ class Sample:
             self.attributes.append(Attribute(name="organism",
                                              value=self.species,
                                              iris="http://purl.obolibrary.org/obo/NCBITaxon_" + self.ncbi_taxon_id))
-
-
+        else:
+            raise OrganismInformationIncompleteException("Both species & taxon id need to be set to add organism "
+                                                         "attribute.")
 
 
 class Attribute:
@@ -90,6 +94,14 @@ class Attribute:
         self.iris = [] if iris is None else [iris]
         self.unit = unit
 
+class ExternalReference:
+    """Object to model an External Reference
+
+    url -- the full url of the reference
+    duos -- an array of duos ids e.g. [DUO:0000005] """
+    def __init__(self, url=None, duos=None):
+        self.url = url
+        self.duos = [] if duos is None else duos
 
 class Relationship:
     def __init__(self, source=None, rel_type=None, target=None):

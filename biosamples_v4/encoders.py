@@ -1,7 +1,7 @@
 from urllib import parse as urlencoder
 from json import JSONEncoder
 from datetime import datetime
-from .models import Sample, Attribute, Relationship, CurationLink, Curation, SearchQuery
+from .models import Sample, Attribute, Relationship, CurationLink, Curation, SearchQuery, ExternalReference
 from .filters import _BioSamplesFilter, _PredefinedFieldBioSamplesFilter
 
 
@@ -26,6 +26,7 @@ class SampleEncoder(JSONEncoder):
         attribute_list_encoder = AttributeListEncoder()
         relationship_encoder = RelationshipEncoder()
         datetime_encoder = ISODateTimeEncoder()
+        external_ref_encoder = ExternalReferenceEncoder()
 
         _dict = dict()
         _dict["name"] = o.name
@@ -35,7 +36,7 @@ class SampleEncoder(JSONEncoder):
         _dict["update"] = datetime_encoder.default(o.update)
         _dict["characteristics"] = attribute_list_encoder.default(o.attributes)
         _dict["relationships"] = [relationship_encoder.default(rel) for rel in o.relations]
-        _dict["externalReferences"] = o.external_references
+        _dict["externalReferences"] = [external_ref_encoder.default(ext_ref) for ext_ref in o.external_references]
         _dict["organization"] = o.organizations
         _dict["contact"] = o.contacts
 
@@ -99,7 +100,31 @@ class ExternalReferenceEncoder(JSONEncoder):
     JSON encoder for ExternalReferences
     """
     def default(self, o):
-        _dict = {"url": o["url"]}
+        _dict = dict()
+        _dict["url"] = o.url
+        _dict["duo"] = o.duos if isinstance(o.duos, list) else [o.duos]
+        return _dict
+
+
+class ExternalReferenceListEncoder(JSONEncoder):
+    """
+    JSON encoder for list of external references
+    """
+    def default(self, o):
+
+        if not isinstance(o, list):
+            return JSONEncoder.default(self, o)
+
+        ext_ref_encoder = ExternalReferenceEncoder()
+        _dict = dict()
+        for ext_ref in o:
+            if not isinstance(ext_ref, ExternalReference):
+                raise Exception("The provided list contains a non external reference object")
+
+            ext_ref_dict = ext_ref_encoder.default(ext_ref)
+            ext_ref_dict.pop("type", None)
+            _dict.setdefault(attr.name, [])(ext_ref_dict)
+
         return _dict
 
 

@@ -12,7 +12,7 @@ def dict_to_sample(d):
         attrs = d['characteristics']
         relationships = getattr(d, 'rel')
     except Exception:
-        raise SampleConvertionException()
+        raise SampleConversionException()
 
 
 def dict_to_attribute(d):
@@ -21,7 +21,7 @@ def dict_to_attribute(d):
     :param d: dictionary to convert
     :return: an attribute
     """
-    raise AttributeConvertionException()
+    raise AttributeConversionException()
 
 
 def dict_to_relationship(d):
@@ -30,7 +30,7 @@ def dict_to_relationship(d):
     :param d:
     :return:
     """
-    raise RelationshipConvertionException()
+    raise RelationshipConversionException()
 
 
 def dict_to_curation(d):
