@@ -94,6 +94,34 @@ class Attribute:
         self.iris = [] if iris is None else [iris]
         self.unit = unit
 
+
+class Organisation:
+    def __init__(self, name, role, email, url, address):
+        self.Name = name
+        self.Role = role
+        self.E_mail = email
+        self.URL = url
+        self.Address = address
+
+
+class Publication:
+    def __init__(self, doi=None, pubmed_id=None):
+        self.doi = doi
+        self.pubmed_id = pubmed_id
+
+
+class Contact:
+    def __init__(self, first_name=None, last_name=None, mid_initials=None, name=None, role=None, email=None,
+                 affiliation=None, url=None):
+        self.FirstName = first_name
+        self.LastName = last_name
+        self.MidInitials = mid_initials
+        self.Name = name
+        self.Role = role
+        self.E_mail = email
+        self.Affiliation = affiliation
+        self.URL = url
+
 class ExternalReference:
     """Object to model an External Reference
 
