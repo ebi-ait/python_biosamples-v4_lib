@@ -1,4 +1,5 @@
 from .exceptions import *
+from .models import Sample
 
 
 def dict_to_sample(d):
@@ -8,9 +9,9 @@ def dict_to_sample(d):
     :return: a sample
     """
     try:
-        accession = d['accession']
-        attrs = d['characteristics']
-        relationships = getattr(d, 'rel')
+        Sample(accession=d['accession'],
+               attrs=d['characteristics'],
+               relationships=getattr(d, 'rel'))
     except Exception:
         raise SampleConversionException()
 
