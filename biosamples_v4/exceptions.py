@@ -18,5 +18,9 @@ class RelationshipConversionException(ConversionException):
     pass
 
 
-class OrganismInformationIncompleteException(Exception):
+class OrganismInformationIncompleteWarning(UserWarning):
+    pass
+
+
+class InvalidRelationshipException(Exception):
     pass
