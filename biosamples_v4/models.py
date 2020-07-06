@@ -5,6 +5,7 @@ import requests
 from urllib.parse import quote
 import json
 from .exceptions import *
+import warnings
 
 
 class Sample:
@@ -20,7 +21,7 @@ class Sample:
         self.species = species
         self.ncbi_taxon_id = str(ncbi_taxon_id) if ncbi_taxon_id is not None else ncbi_taxon_id
         self.attributes = [] if attributes is None else attributes
-        self.relations = [] if relationships is None else relationships
+        self.relationships = [] if relationships is None else relationships
         self.external_references = [] if external_references is None else external_references
         self.organizations = [] if organizations is None else organizations
         self.contacts = [] if contacts is None else contacts
@@ -70,8 +71,8 @@ class Sample:
                 print("Information is not consistent between " + self.species + " and " + str(self.ncbi_taxon_id) +
                       ". Please check information and re-run method")
         else:
-            raise OrganismInformationIncompleteException("One of species or taxon ID need to be set in order to "
-                                                         "complete organism information.")
+            warnings.warn("One of species or taxon ID need to be set in order to complete organism information.",
+                          OrganismInformationIncompleteWarning)
 
 
     def _append_organism_attribute(self):
@@ -80,8 +81,9 @@ class Sample:
                                              value=self.species,
                                              iris="http://purl.obolibrary.org/obo/NCBITaxon_" + self.ncbi_taxon_id))
         else:
-            raise OrganismInformationIncompleteException("Both species & taxon id need to be set to add organism "
-                                                         "attribute.")
+            warnings.warn('Both species & taxon id need to be set to add organism attribute. '
+                          'This sample will be submitted without taxId.',
+                          OrganismInformationIncompleteWarning)
 
 
 class Attribute:
@@ -135,9 +137,12 @@ class Relationship:
     def __init__(self, source=None, rel_type=None, target=None):
         if source is None or rel_type is None or target is None:
             raise Exception("You need to provide a source, "
-                            "a target and the rel_type of relation to make it valid")
+                            "a target and the type of relation to make it valid")
+        relationship_types = ["derived from", "same as", "has member", "child of"]
+        if rel_type not in relationship_types:
+            raise InvalidRelationshipException("Relationship type must be one of " + "; ".join(relationship_types))
         self.source = source
-        self.rel_type = type
+        self.rel_type = rel_type
         self.target = target
 
 
