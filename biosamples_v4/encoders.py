@@ -35,7 +35,7 @@ class SampleEncoder(JSONEncoder):
         _dict["release"] = datetime_encoder.default(o.release)
         _dict["update"] = datetime_encoder.default(o.update)
         _dict["characteristics"] = attribute_list_encoder.default(o.attributes)
-        _dict["relationships"] = [relationship_encoder.default(rel) for rel in o.relations]
+        _dict["relationships"] = [relationship_encoder.default(rel) for rel in o.relationships]
         _dict["externalReferences"] = [external_ref_encoder.default(ext_ref) for ext_ref in o.external_references]
         _dict["organization"] = o.organizations
         _dict["contact"] = o.contacts
@@ -69,8 +69,9 @@ class RelationshipEncoder(JSONEncoder):
 
         _dict = dict()
         _dict["source"] = o.source
-        _dict["type"] = o.type
+        _dict["type"] = o.rel_type
         _dict["target"] = o.target
+        return _dict
 
 
 class AttributeListEncoder(JSONEncoder):
