@@ -2,7 +2,7 @@ import requests
 import logging
 
 from .utilities import is_ok, is_successful, is_not_found
-from .exceptions import JWTMissingException
+from .exceptions import JWTMissingException, ForbiddenResponseWarning
 from .traverson import Traverson, SampleSearchResultsPageNavigator, SampleSearchResultsCursor
 from .encoders import CurationEncoder, SearchQueryEncoder
 from .models import CurationLink, SearchQuery
@@ -153,6 +153,15 @@ class Client:
             .follow("sample", params={"accession": accession}) \
             .get()
 
+        # check if sample exists
+        # headers = {
+        #     "Authorization": "Bearer {}".format(jwt),
+        #     "Content-Type": "application/json"
+        # }
+        # response = requests.get(self._url + "/" + sample["accession"], headers=headers)
+
+        # if response.status_code == 403:
+        #     raise ForbiddenResponseWarning
         if is_ok(response):
             headers = {
                 "Authorization": "Bearer {}".format(jwt),
@@ -263,3 +272,21 @@ class Client:
         :rtype: SampleSearchResultCursor
         """
         return SampleSearchResultsCursor(self.search(text=text, filters=filters, size=size, jwt=jwt))
+
+    def preaccession(self, domain, jwt=None):
+        if jwt is None:
+            raise JWTMissingException
+
+        headers = {
+            "Authorization": "Bearer {}".format(jwt),
+            "Content-Type": "application/hal+json"
+        }
+        preaccession_endpoint = "/samples/accession"
+        preaccession_url = self._url + preaccession_endpoint
+        preaccession_dict = {"name": "pre-accessioned-sample",
+                             "domain": domain}
+        response = requests.post(preaccession_url, json=preaccession_dict, headers=headers)
+        return response.json()["accession"]
+
+
+
