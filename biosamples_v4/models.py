@@ -58,13 +58,9 @@ class Sample:
             taxid_response_json = json.loads(taxid_response.content)
             if isinstance(taxid_response_json, list):
                 taxid_response_json = taxid_response_json[0]
-            if species_response_json["taxId"] == str(self.ncbi_taxon_id):
-                print("Taxon ids are consistent")
-            else:
+            if species_response_json["taxId"] != str(self.ncbi_taxon_id):
                 print("Information is not consistent between " + self.species + " and " + str(self.ncbi_taxon_id))
-            if taxid_response_json["scientificName"] == self.species:
-                print("Species information is consistent")
-            else:
+            if taxid_response_json["scientificName"] != self.species:
                 print("Information is not consistent between " + self.species + " and " + str(self.ncbi_taxon_id) +
                       ". Please check information and re-run method")
         else:
