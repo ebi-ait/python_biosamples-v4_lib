@@ -1,5 +1,6 @@
 import re
 import requests
+from requests.exceptions import HTTPError
 
 first_cap_re = re.compile('(.)([A-Z][a-z]+)')
 all_cap_re = re.compile('([a-z0-9])([A-Z])')
@@ -19,15 +20,15 @@ def merge_samples(sample_a, sample_b):
 
 
 def is_ok(response):
-    return response.status_code == requests.codes.ok
+    return response.status_code == requests.codes['ok']
 
 
 def is_not_found(response):
-    return is_status(response, 404)
+    return response.status_code == requests.codes['not_found']
 
 
 def is_successful(response):
-    return ("{:d}".format(response.status_code)).startswith("2")
+    return 200 <= response.status_code < 300
 
 
 def is_status(response, code=None):
@@ -36,3 +37,12 @@ def is_status(response, code=None):
     if isinstance(code, list):
         return response.status_code in code
     return response.status_code == code
+
+
+def raise_error_with_reason(response):
+    try:
+        response.reason = response.json()['message']
+    except (KeyError, ValueError):
+        pass
+
+    raise response.raise_for_status()

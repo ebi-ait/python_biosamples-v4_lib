@@ -1,7 +1,7 @@
 import requests
 import logging
 
-from .utilities import is_ok, is_successful, is_not_found
+from .utilities import is_ok, is_successful, is_not_found, raise_error_with_reason
 from .exceptions import JWTMissingException
 from .traverson import Traverson, SampleSearchResultsPageNavigator, SampleSearchResultsCursor
 from .encoders import CurationEncoder, SearchQueryEncoder
@@ -81,7 +81,7 @@ class Client:
             # return dict_to_sample(response.json())
             return response.json()
 
-        raise response.raise_for_status()
+        raise_error_with_reason(response)
 
     def fetch_raw(self, accession, jwt=None):
         """
@@ -127,7 +127,7 @@ class Client:
             if is_successful(response):
                 return response.json()
 
-        raise response.raise_for_status()
+        raise_error_with_reason(response)
 
     def update_sample(self, sample, jwt=None):
         """
@@ -162,7 +162,7 @@ class Client:
             if is_successful(response):
                 return response.json()
 
-        response.raise_for_status()
+        raise_error_with_reason(response)
 
     def curate_sample(self, sample, curation_object, domain, jwt=None):
         """
@@ -201,7 +201,7 @@ class Client:
             if is_successful(response):
                 return response.json()
 
-        response.raise_for_status()
+        raise_error_with_reason(response)
 
     def search(self, text=None, filters=None, page=0, size=20, jwt=None):
         """
@@ -228,7 +228,7 @@ class Client:
             response = requests.get(response.url, params=SearchQueryEncoder().default(query_object))
             if is_ok(response):
                 return response.json()
-        response.raise_for_status()
+        raise_error_with_reason(response)
 
     def search_navigator(self, text=None, filters=None, page=0, size=20, jwt=None):
         """

@@ -3,7 +3,7 @@ import logging
 import jwt
 import pytz
 from datetime import datetime, timedelta
-from .utilities import is_ok, is_successful
+from .utilities import is_ok, is_successful, raise_error_with_reason
 
 
 class Client:
@@ -50,7 +50,7 @@ class Client:
         if is_successful(response):
             return response.json()
 
-        raise response.raise_for_status()
+        raise_error_with_reason(response)
 
     def _post_clean_or_rise(self, url, json, headers=None):
         final_headers = self._token_header()
@@ -61,7 +61,7 @@ class Client:
         if is_successful(response):
             return response.json()
 
-        raise response.raise_for_status()
+        raise_error_with_reason(response)
 
     def create_domain(self, name, description):
         """
@@ -120,7 +120,7 @@ class Client:
                 logging.debug("Got token correctly")
                 self.token = response.text
                 return self.token
-            return response.raise_for_status()
+            raise_error_with_reason(response)
         else:
             logging.debug("Using cached token for user {} taken from url {}".format(self.username, self.auth_url))
             return self.token
