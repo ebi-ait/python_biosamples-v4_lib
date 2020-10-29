@@ -3,6 +3,7 @@ import requests_cache
 import re
 import logging
 from .utilities import is_ok, raise_error_with_reason
+from .exceptions import LinkNotFoundException, CursorNotFoundException
 
 requests_cache.install_cache(cache_name='biosamples-cache', backend='sqlite', expire_after=180)
 
@@ -112,7 +113,7 @@ class Traverson:
                     raise_error_with_reason(response)
                 content = response.json()
             else:
-                raise Exception("Couldn't find link {} on resource at {}".format(link, curr_url))
+                raise LinkNotFoundException(f"Couldn't find link {link} in {content['_links'].keys()} on resource at: {curr_url}")
         return response
 
 
@@ -162,7 +163,7 @@ class SampleSearchResultsCursor:
 
     def __init__(self, page):
         if 'cursor' not in page['_links']:
-            raise Exception("The search results don't contain a cursor")
+            raise CursorNotFoundException(f"Couldn't find cursor link within search result _links: {page['_links'].keys()}")
         self.session = Utils.get_hal_session()
         response = self.session.get(page['_links']['cursor']['href'])
         if is_ok(response):
