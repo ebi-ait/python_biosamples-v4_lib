@@ -1,6 +1,7 @@
 import logging
 from datetime import datetime
 from .filters import _BioSamplesFilter
+from .utilities import ena_json_response
 import requests
 from urllib.parse import quote
 import json
@@ -36,14 +37,14 @@ class Sample:
         if self.species is not None and self.ncbi_taxon_id is None:
             self.species = self.species.capitalize()
             response = requests.get(ena_species_lookup_base + quote(self.species))
-            response_json = json.loads(response.content)
+            response_json = ena_json_response(response)
             if isinstance(response_json, list):
                 response_json = response_json[0]
             print("Found taxon for species " + self.species + " with ncbi taxon id " + response_json["taxId"])
             self.ncbi_taxon_id = response_json["taxId"]
         elif self.species is None and self.ncbi_taxon_id is not None:
             response = requests.get(ena_taxid_lookup_base + quote(self.ncbi_taxon_id))
-            response_json = json.loads(response.content)
+            response_json = ena_json_response(response)
             if isinstance(response_json, list):
                 response_json = response_json[0]
             print("Found species for taxon " + self.ncbi_taxon_id + " with species " + response_json["scientificName"])
@@ -51,11 +52,11 @@ class Sample:
         elif self.species is not None and self.ncbi_taxon_id is not None:
             self.species = self.species.capitalize()
             species_response = requests.get(ena_species_lookup_base + quote(self.species))
-            species_response_json = json.loads(species_response.content)
+            species_response_json = ena_json_response(species_response)
             if isinstance(species_response_json, list):
                 species_response_json = species_response_json[0]
             taxid_response = requests.get(ena_taxid_lookup_base + quote(self.ncbi_taxon_id))
-            taxid_response_json = json.loads(taxid_response.content)
+            taxid_response_json = ena_json_response(taxid_response)
             if isinstance(taxid_response_json, list):
                 taxid_response_json = taxid_response_json[0]
             if species_response_json["taxId"] != str(self.ncbi_taxon_id):

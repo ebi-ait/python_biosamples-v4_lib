@@ -1,3 +1,4 @@
+import json
 import re
 import requests
 from requests.exceptions import HTTPError
@@ -37,6 +38,12 @@ def is_status(response, code=None):
     if isinstance(code, list):
         return response.status_code in code
     return response.status_code == code
+
+
+def ena_json_response(response):
+    if response.text == 'No results.':
+        raise HTTPError(f'404 Client Error: No Results at: {response.url}', response)
+    return json.loads(response.content)
 
 
 def raise_error_with_reason(response):
