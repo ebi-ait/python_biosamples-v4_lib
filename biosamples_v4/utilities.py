@@ -47,6 +47,8 @@ def ena_json_response(response):
 
 
 def raise_error_with_reason(response):
+    if is_not_found(response):
+        response.reason = 'No Results'
     try:
         response.reason = response.json()['message']
     except (KeyError, ValueError):
