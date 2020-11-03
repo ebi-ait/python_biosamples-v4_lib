@@ -3,8 +3,10 @@ from nose.tools import assert_true, assert_equal
 
 __API_TEST = "http://localhost:8081/biosamples"
 
+
 def base_traverson():
     return Traverson(base_url=__API_TEST)
+
 
 def test_traverson_get_samples():
     # Verifies traverson is able to get root of the api
@@ -49,6 +51,3 @@ def test_traverson_multiple_path_parameters():
     }
     expected_url = 'my/name/is/Donald/and/i/love/Daisy'
     assert_equal(expected_url, Utils.populate_url(parameterized_url, params))
-
-
-
