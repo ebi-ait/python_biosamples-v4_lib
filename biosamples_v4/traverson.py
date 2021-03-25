@@ -2,7 +2,8 @@ import requests
 import requests_cache
 import re
 import logging
-from .utilities import is_ok
+from .utilities import is_ok, raise_error_with_reason
+from .exceptions import LinkNotFoundException, CursorNotFoundException
 
 requests_cache.install_cache(cache_name='biosamples-cache', backend='sqlite', expire_after=180)
 
@@ -97,8 +98,7 @@ class Traverson:
         logging.debug("Getting url {}".format(curr_url))
         response = self.__session.get(url=curr_url)
         if not is_ok(response):
-            raise Exception("An error occurred while retrieving {} - HTTP({})".format(curr_url,
-                                                                                      response.status_code))
+            raise_error_with_reason(response)
         content = response.json()
         for hop in self.__hops:
             link = hop["link"]
@@ -110,12 +110,10 @@ class Traverson:
                 logging.debug("Getting url {}".format(curr_url))
                 response = self.__session.get(url=curr_url)
                 if not is_ok(response):
-                    raise Exception("An error occurred while retrieving {} - HTTP({})".format(curr_url,
-                                                                                              response.status_code),
-                                    response)
+                    raise_error_with_reason(response)
                 content = response.json()
             else:
-                raise Exception("Couldn't find link {} on resource at {}".format(link, curr_url))
+                raise LinkNotFoundException(f"Couldn't find link {link} in {content['_links'].keys()} on resource at: {curr_url}")
         return response
 
 
@@ -148,7 +146,7 @@ class SampleSearchResultsPageNavigator:
             if is_ok(next_page_response):
                 self._update_status(next_page_response.json())
             else:
-                next_page_response.raise_for_status()
+                raise_error_with_reason(next_page_response)
 
         for entry in self.page_content:
             yield entry
@@ -165,7 +163,7 @@ class SampleSearchResultsCursor:
 
     def __init__(self, page):
         if 'cursor' not in page['_links']:
-            raise Exception("The search results don't contain a cursor")
+            raise CursorNotFoundException(f"Couldn't find cursor link within search result _links: {page['_links'].keys()}")
         self.session = Utils.get_hal_session()
         response = self.session.get(page['_links']['cursor']['href'])
         if is_ok(response):
@@ -173,7 +171,7 @@ class SampleSearchResultsCursor:
             cursor_page = response.json()
             self._update_status(cursor_page)
         else:
-            response.raise_for_status()
+            raise_error_with_reason(response)
 
     def _update_status(self, page):
         if '_embedded' not in page:
@@ -194,7 +192,7 @@ class SampleSearchResultsCursor:
             if is_ok(next_page_response):
                 self._update_status(next_page_response.json())
             else:
-                next_page_response.raise_for_status()
+                raise_error_with_reason(next_page_response)
 
         for entry in self.page_content:
             yield entry
