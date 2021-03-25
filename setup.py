@@ -19,7 +19,7 @@ here = path.abspath(path.dirname(__file__))
 
 setup(
     name='biosamples_v4',
-    version='1.0.0',
+    version='1.1.0',
     description='A lib to interact with BioSamples-v4 API',
     long_description="A library with functions to wrap the BioSamples API - "
                      "https://wwwdev.ebi.ac.uk/biosamples/docs/guides/submit",
