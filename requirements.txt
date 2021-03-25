@@ -1,4 +1,3 @@
-biosamples-v4 @ file:///Users/mshadbolt/Desktop/git_repos/python_biosamples-v4_lib
 certifi==2020.6.20
 chardet==3.0.4
 idna==2.9
